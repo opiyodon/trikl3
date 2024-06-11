@@ -35,13 +35,13 @@ export default function Home() {
                 {item.name}
               </a>
             ))}
-            <img src="/profile.jpg" alt="Profile" className="w-10 h-10 rounded-full ml-4" />
+            <img src="/images/Profile.jpeg" alt="Profile" className="w-10 h-10 rounded-full ml-4" />
           </nav>
         </div>
       </header>
       <main className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
         <div className="px-4 sm:px-0">
-          <h2 className="text-2xl font-semibold text-gray-900">Trikl3</h2>
+          <h2 className="text-2xl font-semibold text-gray-900">Welcome to Trikl3</h2>
           <p className="mt-4 text-gray-600">
             Trikl3 is a platform that connects Kenyan tech students with internship opportunities at leading tech companies. Our AI-driven matching algorithm helps you find internships that are right for you.
           </p>
@@ -67,7 +67,7 @@ export default function Home() {
             <h3 className="text-xl font-medium text-gray-900">Recommended for you</h3>
             <div className="mt-4 grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
   {[
-    { company: <a href="https://www.facebookcareers.com/" style={{ color: 'blue' }}>Facebook</a>, position: 'Software Engineer Intern', logo: '/images/facebook-logo.webp' },
+    { company: <a href="https://www.facebookcareers.com/" style={{ color: 'blue' }}>Facebook</a>, position: 'Software Engineer Intern', logo: '/images/facebook-logo.webp'},
     { company: <a href="https://careers.google.com/" style={{ color: 'blue' }}>Google</a>, position: 'Product Design Intern', logo: '/images/google-logo.webp' },
     { company: <a href="https://jobs.netflix.com/" style={{ color: 'blue' }}>Netflix</a>, position: 'Data Analyst Intern', logo: '/images/netflix-logo.webp' },
     { company: <a href="https://www.apple.com/jobs/us/" style={{ color: 'blue' }}>Apple</a>, position: 'Software Engineer Intern', logo: '/images/apple-logo.webp' },
