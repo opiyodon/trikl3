@@ -1,10 +1,49 @@
+@import url('https://fonts.googleapis.com/css2?family=Clicker+Script&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
+@layer base {
+    :root {
+        --pri: #5F3D8C;
+        --sec: #0000000D;
 
+        --light_bg_bright: #f3f4f6;
+        --light_bg_dim: #F2F2F2;
 
+        --light_border_bright: #d1d5db;
+        --light_border_dim: #374151;
+
+        --light_txt: #000000;
+        --light_txt1: #374151;
+        --light_txt2: #FFFFFF;
+
+        --scroll: #231430;
+    }
+}
+
+html {
+    scroll-behavior: smooth;
+    overflow-x: hidden;
+}
+
+/* Customized Scroll Bar */
+::-webkit-scrollbar {
+    width: 1.2vw;
+}
+
+::-webkit-scrollbar-track {
+    background: var(--scroll);
+}
+
+::-webkit-scrollbar-thumb {
+    background: var(--pri);
+    border: 0.3vw solid var(--scroll);
+    border-radius: 100vw;
+}
 
 .active {
-    @apply text-purple-800;
+    color: var(--pri);
 }

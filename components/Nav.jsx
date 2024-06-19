@@ -20,14 +20,14 @@ const Nav = () => {
   }, [pathName]);
 
   return (
-    <Navbar className="bg-black/5 shadow-lg">
+    <Navbar className="bg-sec shadow-lg">
       <NavbarBrand
         as={Link}
         href='/'
       >
         <Trikl3Logo />
-        <p className="font-bold text-black text-2xl">
-          Trikl<span className="text-purple-800">3.</span>
+        <p className="font-bold text-light_txt text-2xl">
+          Trikl<span className="text-pri">3.</span>
         </p>
       </NavbarBrand>
 
@@ -74,7 +74,7 @@ const Nav = () => {
         >
           <Input
             classNames={{
-              base: "max-w-full sm:max-w-[10rem] h-10",
+              base: "w-full h-10 rounded-full",
               mainWrapper: "h-full",
               input: "text-small",
               inputWrapper: "h-full font-normal text-default-500 bg-default-400/20 dark:bg-default-500/20",
@@ -83,6 +83,7 @@ const Nav = () => {
             size="sm"
             startContent={<SearchIcon size={18} />}
             type="search"
+            style={{ width: "200px", height: "40px" }}
           />
         </NavbarContent>
 
