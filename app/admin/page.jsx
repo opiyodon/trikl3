@@ -1,8 +1,8 @@
-import React from 'react'
+'use client'
 
 const page = () => {
   return (
-    <div>Register</div>
+    <div>Admin Page</div>
   )
 }
 

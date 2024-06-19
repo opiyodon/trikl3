@@ -1,12 +1,12 @@
 'use client'
 
-import Landing from '@/components/Landing'
+import PostInternships from '@/components/PostInternships'
 import Container from '@/components/pageLayout/Container'
 
 const page = () => {
   return (
     <Container>
-      <Landing />
+      <PostInternships />
     </Container>
   )
 }

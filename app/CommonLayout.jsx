@@ -1,4 +1,4 @@
-"use client";
+'use client'
 
 import Footer from "@/components/Footer";
 import Nav from "@/components/Nav";
@@ -19,7 +19,7 @@ const CommonLayout = ({ children }) => {
         <>
             {isAdminRoute ? <AdminNav /> : isAuthRoute ? null : <Nav />}
             {children}
-            {isAdminRoute ? <AdminFooter /> : isAuthRoute ? null : <Footer />}
+            {/* {isAdminRoute ? <AdminFooter /> : isAuthRoute ? null : <Footer />} */}
         </>
     )
 }
