@@ -1,22 +1,28 @@
-import CommonLayout from "./CommonLayout";
-import Providers from "./Providers";
-import "./globals.css";
+import { Inter } from 'next/font/google'
+import './globals.css'
+import Nav from '@/components/Nav'
+import Footer from '@/components/Footer'
+import Providers from './Providers'
+
+const inter = Inter({ subsets: ['latin'] })
+
+export const metadata = {
+  title: 'Mara Labs',
+  description: 'Connecting Kenyan tech students with internship opportunities',
+}
 
 export default function RootLayout({ children }) {
   return (
     <html lang="en">
-      <head>
-        <meta name="viewport" content="width=device-width, initial-scale=1" />
-        <title>Trikl3</title>
-        <link rel="shortcut icon" href="/favicon.ico" type="image/x-icon" />
-      </head>
-      <body>
+      <body className={inter.className}>
         <Providers>
-            <CommonLayout>
-              {children}
-            </CommonLayout>
+          <Nav />
+          <main className="min-h-screen">
+            {children}
+          </main>
+          <Footer />
         </Providers>
       </body>
     </html>
-  );
+  )
 }

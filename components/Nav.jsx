@@ -1,129 +1,80 @@
+'use client'
+
 import React from "react";
-import { Navbar, NavbarBrand, NavbarContent, Link, DropdownItem, DropdownTrigger, Dropdown, DropdownMenu, Avatar, Input } from "@nextui-org/react";
-import Trikl3Logo from "./Trikl3Logo";
-import NavItem from "./NavItem";
+import { Navbar, NavbarBrand, NavbarContent, Link, DropdownItem, DropdownTrigger, Dropdown, DropdownMenu, Avatar, Button } from "@nextui-org/react";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
-import SearchIcon from "./SearchIcon";
 
 const Nav = () => {
   const [activeItem, setActiveItem] = useState("");
-
   const pathName = usePathname();
 
   useEffect(() => {
-    if (pathName === "/") setActiveItem('/');
-    if (pathName === "/internships") setActiveItem('/internships');
-    if (pathName === "/resources") setActiveItem('/resources');
-    if (pathName === "/events") setActiveItem('/events');
-    if (pathName === "/post-internships") setActiveItem('/post-internships');
+    setActiveItem(pathName);
   }, [pathName]);
 
-  return (
-    <Navbar className="bg-sec shadow-lg">
-      <NavbarBrand
-        as={Link}
-        href='/'
+  const NavItem = ({ route, name, isButton = false }) => {
+    const isActive = activeItem === route;
+    if (isButton) {
+      return (
+        <Button as={Link} href={route} color="primary">
+          {name}
+        </Button>
+      );
+    }
+    return (
+      <Link 
+        href={route}
+        color={isActive ? "primary" : "foreground"}
+        className={isActive ? "font-bold" : ""}
       >
-        <Trikl3Logo />
-        <p className="font-bold text-light_txt text-2xl">
-          Trikl<span className="text-pri">3.</span>
-        </p>
+        {name}
+      </Link>
+    );
+  };
+
+  return (
+    <Navbar>
+      <NavbarBrand>
+        <Link href="/" color="foreground">
+          <p className="font-bold text-inherit text-xl">Mara Labs</p>
+        </Link>
       </NavbarBrand>
 
-      <NavbarContent
-        as="div"
-        className="items-center"
-        justify="end"
-      >
-        <NavbarContent as="div" className="gap-7">
-          <NavItem
-            activeItem={activeItem}
-            setActiveItem={setActiveItem}
-            route="/"
-            name="Home"
-          />
-          <NavItem
-            activeItem={activeItem}
-            setActiveItem={setActiveItem}
-            route="/internships"
-            name="Internships"
-          />
-          <NavItem
-            activeItem={activeItem}
-            setActiveItem={setActiveItem}
-            route="/resources"
-            name="Resources"
-          />
-          <NavItem
-            activeItem={activeItem}
-            setActiveItem={setActiveItem}
-            route="/events"
-            name="Events"
-          />
-          <NavItem
-            activeItem={activeItem}
-            setActiveItem={setActiveItem}
-            route="/post-internships"
-            name="Post Internship"
-          />
-        </NavbarContent>
-
-        <NavbarContent
-          as="div"
-        >
-          <Input
-            classNames={{
-              base: "w-full h-10 rounded-full",
-              mainWrapper: "h-full",
-              input: "text-small",
-              inputWrapper: "h-full font-normal text-default-500 bg-default-400/20 dark:bg-default-500/20",
-            }}
-            placeholder="Type to search..."
-            size="sm"
-            startContent={<SearchIcon size={18} />}
-            type="search"
-            style={{ width: "200px", height: "40px" }}
-          />
-        </NavbarContent>
-
-        <NavbarContent
-          as="div"
-        >
-          <Dropdown placement="bottom-end">
-            <DropdownTrigger>
-              <Avatar
-                isBordered
-                as="button"
-                className="transition-transform"
-                color="secondary"
-                name="Jason Hughes"
-                size="sm"
-                src="https://i.pravatar.cc/150?u=a042581f4e29026704d"
-              />
-            </DropdownTrigger>
-            <DropdownMenu aria-label="Profile Actions" variant="flat">
-              <DropdownItem key="profile" className="h-14 gap-2">
-                <p className="font-semibold">Signed in as</p>
-                <p className="font-semibold">zoey@example.com</p>
-              </DropdownItem>
-              <DropdownItem key="settings">My Settings</DropdownItem>
-              <DropdownItem key="team_settings">Team Settings</DropdownItem>
-              <DropdownItem key="analytics">Analytics</DropdownItem>
-              <DropdownItem key="system">System</DropdownItem>
-              <DropdownItem key="configurations">Configurations</DropdownItem>
-              <DropdownItem key="help_and_feedback">Help & Feedback</DropdownItem>
-              <DropdownItem key="logout" color="danger">
-                Log Out
-              </DropdownItem>
-            </DropdownMenu>
-          </Dropdown>
-        </NavbarContent>
+      <NavbarContent className="hidden sm:flex gap-4" justify="center">
+        <NavItem route="/internships" name="Internships" />
+        <NavItem route="/resources" name="Resources" />
+        <NavItem route="/events" name="Events" />
       </NavbarContent>
 
-
+      <NavbarContent justify="end">
+        <NavItem route="/post-internship" name="Post Internship" isButton={true} />
+        <Dropdown placement="bottom-end">
+          <DropdownTrigger>
+            <Avatar
+              isBordered
+              as="button"
+              className="transition-transform"
+              color="primary"
+              name="Jane Doe"
+              size="sm"
+              src="https://i.pravatar.cc/150?u=a042581f4e29026704d"
+            />
+          </DropdownTrigger>
+          <DropdownMenu aria-label="Profile Actions" variant="flat">
+            <DropdownItem key="profile" className="h-14 gap-2">
+              <p className="font-semibold">Signed in as</p>
+              <p className="font-semibold">jane@example.com</p>
+            </DropdownItem>
+            <DropdownItem key="settings" href="/account">My Account</DropdownItem>
+            <DropdownItem key="logout" color="danger">
+              Log Out
+            </DropdownItem>
+          </DropdownMenu>
+        </Dropdown>
+      </NavbarContent>
     </Navbar>
-  )
+  );
 }
 
-export default Nav
+export default Nav;
