@@ -7,8 +7,8 @@ import Providers from './Providers'
 const inter = Inter({ subsets: ['latin'] })
 
 export const metadata = {
-  title: 'Mara Labs',
-  description: 'Connecting Kenyan tech students with internship opportunities',
+  title: 'Trikl3',
+  description: 'Connecting Kenyan tech students with attachment opportunities',
 }
 
 export default function RootLayout({ children }) {

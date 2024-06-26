@@ -37,7 +37,7 @@ const Nav = () => {
     <Navbar>
       <NavbarBrand>
         <Link href="/" color="foreground">
-          <p className="font-bold text-inherit text-xl">Mara Labs</p>
+          <p className="font-bold text-inherit text-xl">Trikl3.</p>
         </Link>
       </NavbarBrand>
 

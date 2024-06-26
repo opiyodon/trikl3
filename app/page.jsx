@@ -31,9 +31,9 @@ export default function Home() {
   return (
     <div className="container mx-auto px-4 py-8">
       <div className="text-center mb-12">
-        <h1 className="text-4xl font-bold mb-4">Welcome to Mara Labs</h1>
+        <h1 className="text-4xl font-bold mb-4">Welcome to Trikl3</h1>
         <p className="max-w-2xl mx-auto mb-8">
-          Mara Labs is a platform that connects Kenyan tech students with internship opportunities at leading tech companies. Our AI-driven matching algorithm helps you find internships that are right for you.
+          Trikl3 is a platform that connects Kenyan tech students with internship opportunities at leading tech companies. Our AI-driven matching algorithm helps you find internships that are right for you.
         </p>
         <Button as={Link} href="/register" color="primary" size="lg">
           Get started

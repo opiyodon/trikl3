@@ -10,7 +10,7 @@ const Footer = () => {
           <Link href="/privacy" className="mx-4 my-2">Privacy Policy</Link>
           <Link href="/terms" className="mx-4 my-2">Terms of Service</Link>
         </div>
-        <p className="text-center text-gray-600">© 2024 Mara Labs</p>
+        <p className="text-center text-gray-600">© 2024 Trikl3</p>
       </div>
     </footer>
   );
