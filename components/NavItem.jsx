@@ -1,37 +1,29 @@
-import { Button, Link, NavbarItem } from '@nextui-org/react';
-import React from 'react';
+import React from "react";
+import { Link, Button } from "@nextui-org/react";
 
-const NavItem = ({ activeItem, setActiveItem, route, name }) => {
-    const isActive = activeItem === route;
+const NavItem = ({ route, name, isButton = false, activeItem }) => {
+  const isActive = activeItem === route;
 
-    const handleClick = () => {
-        setActiveItem(route);
-    };
-
+  if (isButton) {
     return (
-        <NavbarItem>
-            {route === '/post-internships' ? (
-                <Button
-                    as={Link}
-                    href={route}
-                    aria-label={name}
-                    onClick={handleClick}
-                    className="bg-pri rounded-full text-light_txt2 font-bold hover:bg-pri transition-all duration-400 ease-in-out"
-                >
-                    {name}
-                </Button>
-            ) : (
-                <Link
-                    href={route}
-                    aria-label={name}
-                    onClick={handleClick}
-                    className={`text-light_txt font-bold hover:text-pri transition-all duration-400 ease-in-out ${isActive ? 'active' : ''}`}
-                >
-                    {name}
-                </Link>
-            )}
-        </NavbarItem>
+      <Button as={Link} href={route} className="btnPri">
+        {name}
+      </Button>
     );
-}
+  }
+
+  return (
+    <Link
+      href={route}
+      className={`transition duration-300 ease-in-out ${
+        isActive ? "font-bold text-pri" : "text-light_txt"
+      }`}
+      onMouseEnter={(e) => (e.currentTarget.style.color = "var(--pri)")}
+      onMouseLeave={(e) => (e.currentTarget.style.color = isActive ? "var(--pri)" : "var(--light_txt)")}
+    >
+      {name}
+    </Link>
+  );
+};
 
 export default NavItem;
