@@ -28,6 +28,10 @@ module.exports = {
         light_txt2: '#FFFFFF',
         scroll: '#231430',
       },
+      animation: {
+        'spin-slow': 'spin 3s linear infinite',
+        'spin-slower': 'spin 4s linear infinite',
+      },
       fontFamily: {
         clicker: ['"Clicker Script"', 'cursive'],
         poppins: ['"Poppins"', 'sans-serif'],
