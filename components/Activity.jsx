@@ -1,24 +1,20 @@
-import ActivityCard from "./ActivityCard"
-import Container from "./pageLayout/Container"
+import ActivityCard from "./ActivityCard";
 
-const Activity = () => {
+const Activity = ({ recentActivity }) => {
   return (
     <div className="mb-12">
-      <h2 className="text-2xl font-bold mb-4">Your activity</h2>
-      <ActivityCard
-        title="Complete your profile"
-        description="Add more information to get better matches"
-        buttonText="Complete profile"
-        buttonLink="/account"
-      />
-      <ActivityCard
-        title="Apply to internships"
-        description="Start applying to internships"
-        buttonText="View internships"
-        buttonLink="/internships"
-      />
+      <h2 className="text-2xl font-bold mb-4">Your Recent Activity</h2>
+      {recentActivity.map((activity, index) => (
+        <ActivityCard
+          key={index}
+          title={activity.type === "application" ? `Applied to ${activity.company}` : `Updated ${activity.field}`}
+          description={`On ${new Date(activity.date).toLocaleDateString()}`}
+          buttonText={activity.type === "application" ? "View Application" : "Update Profile"}
+          buttonLink={activity.type === "application" ? "/applications" : "/profile"}
+        />
+      ))}
     </div>
-  )
-}
+  );
+};
 
-export default Activity
+export default Activity;

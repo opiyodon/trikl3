@@ -25,12 +25,12 @@ const Nav = () => {
       </NavbarBrand>
       <NavbarContent className="gap-6 mr-52">
         <NavItem route="/" name="Home" activeItem={activeItem} />
-        <NavItem route="/internships" name="Internships" activeItem={activeItem} />
+        <NavItem route="/attachments" name="Attachments" activeItem={activeItem} />
         <NavItem route="/resources" name="Resources" activeItem={activeItem} />
         <NavItem route="/events" name="Events" activeItem={activeItem} />
       </NavbarContent>
       <NavbarContent className="justify-end">
-        <NavItem route="/post-internship" name="Post Internship" isButton={true} />
+        <NavItem route="/post-attachments" name="Post Attachments" isButton={true} />
         <UserProfile />
       </NavbarContent>
     </Navbar>
