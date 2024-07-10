@@ -24,7 +24,7 @@ const Nav = () => {
         </Link>
       </NavbarBrand>
       <NavbarContent className="gap-6 mr-52">
-        <NavItem route="/" name="Home" activeItem={activeItem} />
+        <NavItem route="/dashboard" name="Dashboard" activeItem={activeItem} />
         <NavItem route="/attachments" name="Attachments" activeItem={activeItem} />
         <NavItem route="/resources" name="Resources" activeItem={activeItem} />
         <NavItem route="/events" name="Events" activeItem={activeItem} />
