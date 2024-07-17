@@ -15,14 +15,19 @@ const Nav = () => {
   useEffect(() => {
     setActiveItem(pathName);
     // Check if user is logged in
-    // This is a placeholder. Replace with your actual authentication check
     const checkLoginStatus = () => {
-      // Example: checking a token in localStorage
       const token = localStorage.getItem('userToken');
       setIsLoggedIn(!!token);
     };
     checkLoginStatus();
   }, [pathName]);
+
+  // Function to handle logout
+  const handleLogout = () => {
+    localStorage.removeItem('userToken');
+    setIsLoggedIn(false);
+    // Add any additional logout logic here (e.g., redirecting to home page)
+  };
 
   const LoggedOutNavItems = () => (
     <>
@@ -58,6 +63,9 @@ const Nav = () => {
           <>
             <NavItem route="/post-attachments" name="Post Attachments" isButton={true} />
             <UserProfile />
+            <Button onClick={handleLogout} className="btnSec">
+              Logout
+            </Button>
           </>
         ) : (
           <div className="flex justify-center gap-4">
