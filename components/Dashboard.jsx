@@ -15,8 +15,8 @@ const Dashboard = () => {
     // Simulating API call to fetch user data
     setTimeout(() => {
       setUser({
-        name: "John Doe",
-        email: "john@example.com",
+        name: "Don Artkins",
+        email: "donartkins@gmail.com",
         profileCompletion: 70,
         recentActivity: [
           { type: "application", company: "Tech Corp", date: "2024-07-08" },
@@ -46,7 +46,7 @@ const Dashboard = () => {
           <h2 className="text-2xl font-bold mb-4">Profile Completion</h2>
           <Progress value={user.profileCompletion} className="mb-4" />
           <p>{user.profileCompletion}% complete</p>
-          <Button as={Link} href="/profile" className="btnPri mt-4">
+          <Button as={Link} href="/account" className="btnPri mt-4">
             Complete your profile
           </Button>
         </div>

@@ -4,13 +4,13 @@ import { useState } from 'react';
 import { Input, Button, Avatar, Progress, Textarea } from "@nextui-org/react";
 
 export default function AccountPage() {
-  const [profileStrength, setProfileStrength] = useState(60);
+  const [profileStrength, setProfileStrength] = useState(70);
   const [userData, setUserData] = useState({
-    fullName: 'Jane Doe',
-    email: 'jane@example.com',
-    university: 'University of Nairobi',
-    fieldOfStudy: 'Computer Science',
-    skills: 'JavaScript, React, Node.js',
+    fullName: 'Don Artkins',
+    email: 'donartkins@gmail.com',
+    university: 'Kabarak University',
+    fieldOfStudy: 'Information Technology',
+    skills: 'JavaScript, React, Node JS, Next JS, Tailwind CSS',
     bio: 'Passionate about technology and innovation.',
   });
 
@@ -34,7 +34,7 @@ export default function AccountPage() {
       <h1 className="text-3xl font-bold mb-8">Your Account</h1>
       <div className="flex flex-col md:flex-row gap-8">
         <div className="md:w-1/3">
-          <Avatar src="https://i.pravatar.cc/150?u=a042581f4e29026704d" className="w-32 h-32 mb-4" />
+          <Avatar src="/assets/avatar.png" className="w-32 h-32 mb-4" />
           <Button>Upload new picture</Button>
         </div>
         <form onSubmit={handleSubmit} className="md:w-2/3">
