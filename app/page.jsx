@@ -58,9 +58,6 @@ const LandingPage = () => {
           <Button as={Link} href="/register" className="btnPri">
             Get Started
           </Button>
-          <Button as={Link} href="/login" className="btnSec">
-            Login
-          </Button>
         </div>
       </header>
 
