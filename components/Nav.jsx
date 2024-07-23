@@ -3,30 +3,22 @@
 import React, { useEffect, useState } from "react";
 import { Navbar, NavbarBrand, NavbarContent, Link, Button } from "@nextui-org/react";
 import { usePathname } from "next/navigation";
+import { useSession, signOut } from "next-auth/react";
 import Trikl3Logo from "./Trikl3Logo";
 import NavItem from "./NavItem";
 import UserProfile from "./UserProfile";
 
 const Nav = () => {
   const [activeItem, setActiveItem] = useState("");
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
   const pathName = usePathname();
+  const { data: session, status } = useSession();
 
   useEffect(() => {
     setActiveItem(pathName);
-    // Check if user is logged in
-    const checkLoginStatus = () => {
-      const token = localStorage.getItem('userToken');
-      setIsLoggedIn(!!token);
-    };
-    checkLoginStatus();
   }, [pathName]);
 
-  // Function to handle logout
   const handleLogout = () => {
-    localStorage.removeItem('userToken');
-    setIsLoggedIn(false);
-    // Add any additional logout logic here (e.g., redirecting to home page)
+    signOut();
   };
 
   const LoggedOutNavItems = () => (
@@ -41,9 +33,9 @@ const Nav = () => {
   const LoggedInNavItems = () => (
     <>
       <NavItem route="/dashboard" name="Dashboard" activeItem={activeItem} />
-      <NavItem route="/attachments" name="Attachments" activeItem={activeItem} />
-      <NavItem route="/resources" name="Resources" activeItem={activeItem} />
-      <NavItem route="/events" name="Events" activeItem={activeItem} />
+      <NavItem route="/dashboard/attachments" name="Attachments" activeItem={activeItem} />
+      <NavItem route="/dashboard/resources" name="Resources" activeItem={activeItem} />
+      <NavItem route="/dashboard/events" name="Events" activeItem={activeItem} />
     </>
   );
 
@@ -56,12 +48,12 @@ const Nav = () => {
         </Link>
       </NavbarBrand>
       <NavbarContent className="gap-6 mr-52">
-        {isLoggedIn ? <LoggedInNavItems /> : <LoggedOutNavItems />}
+        {status === "authenticated" ? <LoggedInNavItems /> : <LoggedOutNavItems />}
       </NavbarContent>
       <NavbarContent className="justify-end">
-        {isLoggedIn ? (
+        {status === "authenticated" ? (
           <>
-            <NavItem route="/post-attachments" name="Post Attachments" isButton={true} />
+            <NavItem route="/dashboard/post-attachments" name="Post Attachments" isButton={true} />
             <UserProfile />
             <Button onClick={handleLogout} className="btnSec">
               Logout
