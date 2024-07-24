@@ -100,7 +100,11 @@ export default function LoginPage() {
         </p>
         <div className="flex justify-center items-center">
           <span className={`mr-2 ${!isCompany ? 'font-bold' : ''}`}>Student</span>
-          <Switch checked={isCompany} onChange={() => setIsCompany(!isCompany)} />
+          <Switch
+            checked={isCompany}
+            onChange={() => setIsCompany(!isCompany)}
+            color="secondary"
+          />
           <span className={`ml-2 ${isCompany ? 'font-bold' : ''}`}>Company</span>
         </div>
       </div>
@@ -143,8 +147,8 @@ export default function LoginPage() {
           </Checkbox>
           <Link href="/forgot-password" className="text-pri">Forgot password?</Link>
         </div>
-        <Button 
-          type="submit" 
+        <Button
+          type="submit"
           className="btnPri w-full mb-4"
           disabled={isSubmitting}
         >

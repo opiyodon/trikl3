@@ -44,9 +44,9 @@ const Dashboard = () => {
         </p>
         <div className="bg-white p-6 rounded-lg shadow-md mb-8">
           <h2 className="text-2xl font-bold mb-4">Profile Completion</h2>
-          <Progress value={user.profileCompletion} className="mb-4" />
+          <Progress color='secondary' value={user.profileCompletion} className="mb-4" />
           <p>{user.profileCompletion}% complete</p>
-          <Button as={Link} href="/account" className="btnPri mt-4">
+          <Button as={Link} href="/dashboard/account" className="btnPri mt-4">
             Complete your profile
           </Button>
         </div>

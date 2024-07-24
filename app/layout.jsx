@@ -1,11 +1,9 @@
-'use client'
-
 import { Inter } from 'next/font/google'
 import './globals.css'
 import Nav from '@/components/Nav'
 import Footer from '@/components/Footer'
 import Providers from './Providers'
-import { SessionProvider } from 'next-auth/react'
+import SessionWrapper from '@/components/SessionWrapper'
 
 const inter = Inter({ subsets: ['latin'] })
 
@@ -13,7 +11,7 @@ export default function RootLayout({ children }) {
   return (
     <html lang="en">
       <body className={inter.className}>
-        <SessionProvider>
+        <SessionWrapper>
           <Providers>
             <Nav />
             <main className="min-h-screen">
@@ -21,7 +19,7 @@ export default function RootLayout({ children }) {
             </main>
             <Footer />
           </Providers>
-        </SessionProvider>
+        </SessionWrapper>
       </body>
     </html>
   )
