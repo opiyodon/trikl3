@@ -141,7 +141,11 @@ export default function RegisterPage() {
         </p>
         <div className="flex justify-center items-center">
           <span className={`mr-2 ${!isCompany ? 'font-bold' : ''}`}>Student</span>
-          <Switch checked={isCompany} onChange={() => setIsCompany(!isCompany)} />
+          <Switch
+            checked={isCompany}
+            onChange={() => setIsCompany(!isCompany)}
+            color="secondary"
+          />
           <span className={`ml-2 ${isCompany ? 'font-bold' : ''}`}>Company</span>
         </div>
       </div>

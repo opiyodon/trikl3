@@ -10,7 +10,7 @@ const Activity = ({ recentActivity }) => {
           title={activity.type === "application" ? `Applied to ${activity.company}` : `Updated ${activity.field}`}
           description={`On ${new Date(activity.date).toLocaleDateString()}`}
           buttonText={activity.type === "application" ? "View Application" : "Update Profile"}
-          buttonLink={activity.type === "application" ? "/applications" : "/profile"}
+          buttonLink={activity.type === "application" ? "/dashboard/applications" : "/dashboard/account"}
         />
       ))}
     </div>
