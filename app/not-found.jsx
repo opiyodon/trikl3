@@ -9,7 +9,7 @@ export default function NotFound() {
       <p className="mb-8 max-w-md mx-auto">
         The page you're looking for doesn't exist or has been moved.
       </p>
-      <Button as={Link} href="/" color="primary" size="lg">
+      <Button as={Link} href="/" className="btnPri">
         Return to Home
       </Button>
     </div>

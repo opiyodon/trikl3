@@ -2,10 +2,12 @@
 
 import { useState } from 'react';
 import { Input, Textarea, Button, Select, SelectItem } from "@nextui-org/react";
+import { useSession } from 'next-auth/react'; // Add authentication
 
 export default function PostInternshipPage() {
+  const { data: session } = useSession(); // Add authentication session
   const [formData, setFormData] = useState({
-    companyName: '',
+    companyName: session?.user?.name || '', // Use authenticated user's company name if available
     position: '',
     location: '',
     description: '',
@@ -21,11 +23,26 @@ export default function PostInternshipPage() {
     }));
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    // Here you would typically send the formData to your backend
-    console.log(formData);
-    alert('Internship posted successfully!');
+    try {
+      const response = await fetch('/api/attachments', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(formData)
+      });
+
+      if (response.ok) {
+        alert('Internship posted successfully!');
+      } else {
+        alert('Failed to post internship.');
+      }
+    } catch (error) {
+      console.error('Failed to post internship:', error);
+      alert('Failed to post internship.');
+    }
   };
 
   return (
@@ -38,6 +55,7 @@ export default function PostInternshipPage() {
           value={formData.companyName}
           onChange={handleChange}
           className="mb-4"
+          disabled // Disable input if company name is pre-filled
         />
         <Input
           label="Position"
