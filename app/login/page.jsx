@@ -76,7 +76,7 @@ export default function LoginPage() {
         toast.error(result.error);
       } else {
         toast.success('Login successful');
-        setTimeout(() => router.push('/dashboard'), 2000);
+        setTimeout(() => router.push('/student-dashboard'), 2000);
       }
     } catch (error) {
       toast.error('An error occurred. Please try again.');

@@ -1,31 +1,66 @@
 'use client';
 
+import { useState, useEffect } from 'react';
 import { Card, CardBody, CardHeader, Image, Button, Link } from "@nextui-org/react";
 import Container from '@/components/pageLayout/Container';
+import FuturisticLoader from '@/components/FuturisticLoader';
 
-const ServicesPage = () => {
-  const services = [
-    {
-      title: "AI-Powered Job Matching",
-      description: "Our advanced algorithm matches your skills and preferences with the perfect internship opportunities.",
-      image: "https://images.unsplash.com/photo-1518186285589-2f7649de83e0?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80"
-    },
-    {
-      title: "Profile Optimization",
-      description: "Get expert advice on how to make your profile stand out to potential employers.",
-      image: "https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80"
-    },
-    {
-      title: "Interview Preparation",
-      description: "Access resources and tips to help you ace your internship interviews.",
-      image: "https://images.unsplash.com/photo-1516321318423-f06f85e504b3?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80"
-    },
-    {
-      title: "Career Guidance",
-      description: "Get personalized advice from industry professionals to help shape your tech career.",
-      image: "https://images.unsplash.com/photo-1487528278747-ba99ed528ebc?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80"
+const UNSPLASH_ACCESS_KEY = process.env.NEXT_PUBLIC_UNSPLASH_ACCESS_KEY;
+
+const Services = () => {
+  const [isLoading, setIsLoading] = useState(true);
+  const [services, setServices] = useState([]);
+
+  const fetchServiceImages = async () => {
+    const serviceData = [
+      {
+        title: "AI-Powered Job Matching",
+        description: "Our advanced algorithm matches your skills and preferences with the perfect internship opportunities.",
+        query: "artificial intelligence technology"
+      },
+      {
+        title: "Profile Optimization",
+        description: "Get expert advice on how to make your profile stand out to potential employers.",
+        query: "professional profile resume"
+      },
+      {
+        title: "Interview Preparation",
+        description: "Access resources and tips to help you ace your internship interviews.",
+        query: "job interview preparation"
+      },
+      {
+        title: "Career Guidance",
+        description: "Get personalized advice from industry professionals to help shape your tech career.",
+        query: "career counseling technology"
+      }
+    ];
+
+    try {
+      const servicesWithImages = await Promise.all(serviceData.map(async (service) => {
+        const imageResponse = await fetch(`https://api.unsplash.com/photos/random?query=${encodeURIComponent(service.query)}&client_id=${UNSPLASH_ACCESS_KEY}`);
+        const imageData = await imageResponse.json();
+        return { ...service, image: imageData.urls.regular };
+      }));
+
+      setServices(servicesWithImages);
+      setIsLoading(false);
+    } catch (error) {
+      console.error('Error fetching service images:', error);
+      setIsLoading(false);
     }
-  ];
+  };
+
+  useEffect(() => {
+    fetchServiceImages();
+  }, []);
+
+  if (isLoading) {
+    return (
+      <Container>
+        <FuturisticLoader />
+      </Container>
+    );
+  }
 
   return (
     <Container>
@@ -71,16 +106,14 @@ const ServicesPage = () => {
         </Card>
       </section>
 
-      <section>
+      <section className="text-center">
         <h2 className="text-3xl font-bold mb-8">Ready to Boost Your Tech Career?</h2>
-        <div>
-          <Button as={Link} href="/register" className="btnPri text-lg px-8 py-4">
-            Get Started Now
-          </Button>
-        </div>
+        <Button as={Link} href="/register" className="btnPri text-lg px-8 py-4">
+          Get Started Now
+        </Button>
       </section>
     </Container>
   );
 };
 
-export default ServicesPage;
+export default Services;

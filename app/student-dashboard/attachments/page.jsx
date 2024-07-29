@@ -5,8 +5,9 @@ import { Input, Button, Card, CardBody, CardFooter } from "@nextui-org/react";
 import Link from 'next/link';
 import Container from '@/components/pageLayout/Container';
 import FuturisticLoader from '@/components/FuturisticLoader';
+import { useSession } from 'next-auth/react'; // Add authentication
 
-const AttachmentCard = ({ company, title, location, description, url }) => (
+const AttachmentCard = ({ company, title, location, description, url, isLocal }) => (
   <Card className="mb-4 h-[300px] flex flex-col">
     <CardBody className="flex-grow overflow-hidden">
       <h3 className="text-lg font-semibold mb-2">{title}</h3>
@@ -14,9 +15,15 @@ const AttachmentCard = ({ company, title, location, description, url }) => (
       <p className="text-sm line-clamp-4">{description}</p>
     </CardBody>
     <CardFooter>
-      <Link href={url} passHref target="_blank" rel="noopener noreferrer" className="w-full">
-        <Button className="btnPri w-full">Apply Now</Button>
-      </Link>
+      {isLocal ? (
+        <Link href={`/apply/${url}`} passHref>
+          <Button className="btnPri w-full">Apply Now</Button>
+        </Link>
+      ) : (
+        <Link href={url} passHref target="_blank" rel="noopener noreferrer" className="w-full">
+          <Button className="btnPri w-full">Apply Now</Button>
+        </Link>
+      )}
     </CardFooter>
   </Card>
 );
@@ -55,14 +62,26 @@ const API_KEY = process.env.NEXT_PUBLIC_RAPID_API_KEY;
 const cache = new Map();
 
 export default function AttachmentOpportunitiesPage() {
+  const { data: session } = useSession(); // Add authentication session
   const [searchTerm, setSearchTerm] = useState('');
   const [opportunities, setOpportunities] = useState([]);
+  const [localOpportunities, setLocalOpportunities] = useState([]); // Add local opportunities
   const [isLoading, setIsLoading] = useState(false);
   const [isInitialLoading, setIsInitialLoading] = useState(true);
   const [error, setError] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const lastRequestTime = useRef(0);
+
+  const fetchLocalOpportunities = useCallback(async () => {
+    try {
+      const response = await fetch('/api/attachments');
+      const data = await response.json();
+      setLocalOpportunities(data);
+    } catch (error) {
+      console.error('Failed to fetch local opportunities:', error);
+    }
+  }, []);
 
   const fetchOpportunities = useCallback(async (page, search = '') => {
     setIsLoading(true);
@@ -135,6 +154,10 @@ export default function AttachmentOpportunitiesPage() {
     return () => clearTimeout(debounceTimer);
   }, [fetchOpportunities, searchTerm]);
 
+  useEffect(() => {
+    fetchLocalOpportunities();
+  }, [fetchLocalOpportunities]);
+
   const loadMore = () => {
     if (currentPage < totalPages) {
       fetchOpportunities(currentPage + 1, searchTerm);
@@ -180,6 +203,17 @@ export default function AttachmentOpportunitiesPage() {
         <FuturisticLoader />
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          {localOpportunities.map((opportunity) => (
+            <AttachmentCard
+              key={opportunity._id}
+              company={opportunity.companyName}
+              title={opportunity.position}
+              location={opportunity.location}
+              description={opportunity.description}
+              url={opportunity._id} // Use the MongoDB ID
+              isLocal={true}
+            />
+          ))}
           {opportunities.map((opportunity) => (
             <AttachmentCard
               key={opportunity.job_id}
@@ -188,6 +222,7 @@ export default function AttachmentOpportunitiesPage() {
               location={opportunity.job_city}
               description={opportunity.job_description}
               url={opportunity.job_apply_link}
+              isLocal={false}
             />
           ))}
         </div>

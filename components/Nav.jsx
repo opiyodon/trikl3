@@ -36,10 +36,10 @@ const Nav = () => {
 
   const LoggedInNavItems = () => (
     <>
-      <NavItem route="/dashboard" name="Dashboard" activeItem={activeItem} />
-      <NavItem route="/dashboard/attachments" name="Attachments" activeItem={activeItem} />
-      <NavItem route="/dashboard/resources" name="Resources" activeItem={activeItem} />
-      <NavItem route="/dashboard/events" name="Events" activeItem={activeItem} />
+      <NavItem route="/student-dashboard" name="Dashboard" activeItem={activeItem} />
+      <NavItem route="/student-dashboard/attachments" name="Attachments" activeItem={activeItem} />
+      <NavItem route="/student-dashboard/resources" name="Resources" activeItem={activeItem} />
+      <NavItem route="/student-dashboard/events" name="Events" activeItem={activeItem} />
     </>
   );
 
@@ -47,7 +47,7 @@ const Nav = () => {
     <Navbar className="bg-sec py-3">
       <NavbarBrand className="mr-52">
       {status === "authenticated" ? (
-          <Link href="/dashboard" className="text-light_txt">
+          <Link href="/student-dashboard" className="text-light_txt">
           <Trikl3Logo />
           <p className="font-bold text-inherit text-xl">Trik<span className="text-pri">l3.</span></p>
         </Link>
@@ -64,7 +64,7 @@ const Nav = () => {
       <NavbarContent className="justify-end">
         {status === "authenticated" ? (
           <>
-            <NavItem route="/dashboard/post-attachments" name="Post Attachments" isButton={true} />
+            <NavItem route="/student-dashboard/post-attachments" name="Post Attachments" isButton={true} />
             <UserProfile />
           </>
         ) : (
