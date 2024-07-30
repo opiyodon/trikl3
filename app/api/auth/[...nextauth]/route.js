@@ -11,20 +11,18 @@ export const authOptions = {
       name: 'Credentials',
       credentials: {
         email: { label: "Email", type: "text" },
-        password: { label: "Password", type: "password" }
+        password: { label: "Password", type: "password" },
+        userType: { label: "User Type", type: "text" }
       },
       async authorize(credentials) {
-        if (!credentials?.email || !credentials?.password) {
-          throw new Error('Please enter an email and password');
+        if (!credentials?.email || !credentials?.password || !credentials?.userType) {
+          throw new Error('Please enter an email, password, and select user type');
         }
 
         await connectToDatabase();
 
-        // Check in both Student and Company collections
-        const student = await Student.findOne({ email: credentials.email });
-        const company = await Company.findOne({ email: credentials.email });
-
-        const user = student || company;
+        const Model = credentials.userType === 'student' ? Student : Company;
+        const user = await Model.findOne({ email: credentials.email });
 
         if (!user) {
           throw new Error('No user found with this email');
@@ -40,7 +38,7 @@ export const authOptions = {
           id: user._id.toString(),
           email: user.email,
           name: user.fullName || user.companyName,
-          userType: student ? 'student' : 'company'
+          userType: credentials.userType
         };
       }
     })

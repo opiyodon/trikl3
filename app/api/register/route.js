@@ -8,8 +8,11 @@ export async function POST(req) {
         const { userType, email, password, ...rest } = await req.json();
         await connectToDatabase();
 
+        // Determine the model based on userType
+        const Model = userType === 'student' ? Student : Company;
+
         // Check if user already exists
-        const existingUser = await (userType === 'student' ? Student : Company).findOne({ email });
+        const existingUser = await Model.findOne({ email });
         if (existingUser) {
             return new Response(JSON.stringify({ message: 'User already exists' }), {
                 status: 400,
@@ -21,7 +24,7 @@ export async function POST(req) {
         const hashedPassword = await bcrypt.hash(password, 10);
 
         // Create new user
-        const newUser = new (userType === 'student' ? Student : Company)({
+        const newUser = new Model({
             email,
             password: hashedPassword,
             ...rest,
