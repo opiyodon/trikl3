@@ -4,13 +4,13 @@ import Company from '@/models/companies';
 
 export async function POST(req) {
     try {
-        const { email } = await req.json();
+        const { email, userType } = await req.json();
         await connectToDatabase();
 
-        const studentExists = await Student.findOne({ email }).select('_id');
-        const companyExists = await Company.findOne({ email }).select('_id');
+        const Model = userType === 'student' ? Student : Company;
+        const userExists = await Model.findOne({ email }).select('_id');
 
-        return new Response(JSON.stringify({ exists: !!(studentExists || companyExists) }), {
+        return new Response(JSON.stringify({ exists: !!userExists }), {
             status: 200,
             headers: { 'Content-Type': 'application/json' },
         });

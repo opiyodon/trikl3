@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { Input, Button, Checkbox, Link, Switch, Progress } from "@nextui-org/react";
 import { useRouter } from 'next/navigation';
+import { signIn } from 'next-auth/react';
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { Eye, EyeOff } from 'lucide-react';
@@ -108,19 +109,44 @@ export default function RegisterPage() {
       const res = await fetch('/api/register', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ ...formData, userType: isCompany ? 'company' : 'student' }),
+        body: JSON.stringify({
+          userType: isCompany ? 'company' : 'student',
+          email: formData.email,
+          password: formData.password,
+          fullName: isCompany ? formData.companyName : formData.fullName,
+          ...(isCompany
+            ? { industry: formData.industry }
+            : { institution: formData.institution, fieldOfStudy: formData.fieldOfStudy }
+          ),
+        }),
       });
 
       const data = await res.json();
 
       if (res.ok) {
         toast.success('Registration successful');
-        setTimeout(() => router.push('/dashboard'), 2000);
+
+        // Attempt to sign in the user immediately after successful registration
+        const signInResult = await signIn('credentials', {
+          redirect: false,
+          email: formData.email,
+          password: formData.password,
+          userType: isCompany ? 'company' : 'student',
+        });
+
+        if (signInResult.error) {
+          toast.error('Registration successful, but automatic login failed. Please log in manually.');
+          setTimeout(() => router.push('/login'), 2000);
+        } else {
+          toast.success('Login successful');
+          setTimeout(() => router.push(isCompany ? '/company-dashboard' : '/student-dashboard'), 2000);
+        }
       } else {
         toast.error(data.message || 'Registration failed');
       }
     } catch (error) {
-      toast.error('An error occurred. Please try again.');
+      console.error('Registration error:', error);
+      toast.error('An unexpected error occurred. Please try again later.');
     } finally {
       setIsSubmitting(false);
     }
@@ -187,10 +213,10 @@ export default function RegisterPage() {
             {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
           </button>
         </div>
-        <Progress 
-          value={passwordStrength} 
-          color={getPasswordStrengthColor(passwordStrength)} 
-          className="mb-2" 
+        <Progress
+          value={passwordStrength}
+          color={getPasswordStrengthColor(passwordStrength)}
+          className="mb-2"
         />
         <p className="text-sm mb-4">Password strength: {passwordStrength}%</p>
         <div className="mb-4 relative">
@@ -252,13 +278,16 @@ export default function RegisterPage() {
           I agree to the terms and conditions
         </Checkbox>
         {errors.agreeTerms && <p className="text-red-500 text-sm mb-4">{errors.agreeTerms}</p>}
-        <Button 
-          type="submit" 
+        <Button
+          type="submit"
           className="btnPri w-full mb-4"
           disabled={isSubmitting}
         >
           {isSubmitting ? (
-            <div className="animate-spin rounded-full h-6 w-6 border-t-2 border-b-2 border-white"></div>
+            <>
+              <div className="animate-spin rounded-full h-6 w-6 border-t-2 border-b-2 border-white mr-2"></div>
+              Registering...
+            </>
           ) : `Register as ${isCompany ? 'Company' : 'Student'}`}
         </Button>
         <p className="text-center">
