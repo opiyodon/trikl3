@@ -1,18 +1,41 @@
-const RecommendedCard = ({ company, position, logo, jobUrl, techField }) => (
-    <a 
-        href={jobUrl}
-        target="_blank"
-        rel="noopener noreferrer"
-        className="block bg-white p-4 rounded-lg shadow-md hover:shadow-xl transition duration-300 ease-in-out cursor-pointer border-2 border-gray-400 hover:border-gray-600"
+import { useState } from 'react';
+import { Card, CardBody, CardFooter, Image } from "@nextui-org/react";
+
+const RecommendedCard = ({ company, position, location, jobUrl }) => {
+  const [imageError, setImageError] = useState(false);
+
+  const getImageUrl = () => {
+    if (imageError) {
+      // Fallback to a generic image or company initial
+      return `https://ui-avatars.com/api/?name=${encodeURIComponent(company)}&background=random&color=fff`;
+    }
+    return `https://logo.clearbit.com/${company.toLowerCase().replace(/\s/g, '')}.com`;
+  };
+
+  return (
+    <Card
+      isPressable
+      isHoverable
+      onPress={() => window.open(jobUrl, '_blank', 'noopener,noreferrer')}
+      className="cursor-pointer h-[300px] flex flex-col"
     >
-        <div className="relative">
-            <img src={logo} alt={`${company} logo`} className="w-full h-40 object-cover rounded-md mb-4" />
-            <div className="absolute inset-0 bg-black opacity-0 hover:opacity-10 transition-opacity duration-300 rounded-md"></div>
+      <CardBody className="p-0 flex-grow">
+        <div className="relative w-full h-full">
+          <Image
+            src={getImageUrl()}
+            alt={`${company} logo`}
+            className="absolute inset-0 w-full h-full object-cover"
+            onError={() => setImageError(true)}
+          />
         </div>
-        <h4 className="font-semibold mb-2">{position}</h4>
-        <p className="text-sm text-blue-600 mb-1">{company}</p>
-        <p className="text-xs text-gray-500">{techField}</p>
-    </a>
-);
+      </CardBody>
+      <CardFooter className="flex-col items-start bg-white bg-opacity-90 absolute bottom-0 left-0 right-0 p-3">
+        <h4 className="font-semibold text-lg truncate w-full">{position}</h4>
+        <p className="text-sm text-default-500 truncate w-full">{company}</p>
+        <p className="text-xs text-default-400 truncate w-full">{location}</p>
+      </CardFooter>
+    </Card>
+  );
+};
 
 export default RecommendedCard;

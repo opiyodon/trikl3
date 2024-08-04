@@ -1,15 +1,15 @@
 'use client'
 
 import { useState, useEffect, useCallback } from 'react';
-import { Card, CardBody, CardFooter, Button, Input, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, useDisclosure } from "@nextui-org/react";
+import { Input, Button, Card, CardBody, CardFooter, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, useDisclosure } from "@nextui-org/react";
 import Container from '@/components/pageLayout/Container';
 import FuturisticLoader from '@/components/FuturisticLoader';
 
-const EventCard = ({ title, date, location, description, onClick }) => (
+const EventCard = ({ title, company, location, description, onClick }) => (
   <Card className="mb-4 h-[300px] flex flex-col hover:shadow-lg transition-shadow duration-300">
     <CardBody className="flex-grow overflow-hidden">
       <h3 className="text-lg font-semibold mb-2">{title}</h3>
-      <p className="text-sm text-gray-500 mb-2">{date} - {location}</p>
+      <p className="text-sm text-gray-500 mb-2">{company} - {location}</p>
       <p className="text-sm line-clamp-3">{description}</p>
     </CardBody>
     <CardFooter>
@@ -46,10 +46,28 @@ const SearchIcon = (props) => (
   </svg>
 );
 
-const API_KEY = process.env.NEXT_PUBLIC_RAPID_API_KEY;
-const PREDICTHQ_HOST = 'predicthq-event-search.p.rapidapi.com';
+const fetchEventsFromAPI = async (page, search = '') => {
+  const apiKey = process.env.NEXT_PUBLIC_RAPID_API_KEY;
+  const url = `https://api.rapidapi.com/events?page=${page}&search=${encodeURIComponent(search)}`;
 
-const cache = new Map();
+  const response = await fetch(url, {
+    method: 'GET',
+    headers: {
+      'x-rapidapi-host': 'api.rapidapi.com',
+      'x-rapidapi-key': apiKey,
+    },
+  });
+
+  if (!response.ok) {
+    throw new Error('Failed to fetch events');
+  }
+
+  const data = await response.json();
+  return {
+    events: data.results,
+    totalPages: data.total_pages,
+  };
+};
 
 export default function EventsPage() {
   const [searchTerm, setSearchTerm] = useState('');
@@ -66,44 +84,13 @@ export default function EventsPage() {
     setIsLoading(true);
     setError(null);
 
-    const cacheKey = `${search}-${page}`;
-    if (cache.has(cacheKey)) {
-      const cachedData = cache.get(cacheKey);
-      setEvents(prevEvents => page === 1 ? cachedData.results : [...prevEvents, ...cachedData.results]);
-      setTotalPages(Math.ceil(cachedData.count / 10));
-      setCurrentPage(page);
-      setIsLoading(false);
-      return;
-    }
-
     try {
-      const response = await fetch(
-        `https://${PREDICTHQ_HOST}/v1/events/?q=${encodeURIComponent(search + ' tech')}&limit=10&offset=${(page - 1) * 10}&sort=start`,
-        {
-          method: 'GET',
-          headers: {
-            'X-RapidAPI-Key': API_KEY,
-            'X-RapidAPI-Host': PREDICTHQ_HOST
-          }
-        }
-      );
-
-      if (!response.ok) {
-        throw new Error('API request failed');
-      }
-
-      const data = await response.json();
-
-      if (data.results && data.results.length > 0) {
-        cache.set(cacheKey, data);
-        setEvents(prevEvents => page === 1 ? data.results : [...prevEvents, ...data.results]);
-        setTotalPages(Math.ceil(data.count / 10));
-        setCurrentPage(page);
-      } else {
-        setError('No events found. Try a different search term.');
-      }
+      const { events, totalPages } = await fetchEventsFromAPI(page, search);
+      setEvents(prevEvents => page === 1 ? events : [...prevEvents, ...events]);
+      setTotalPages(totalPages);
+      setCurrentPage(page);
     } catch (error) {
-      setError(error.message || 'Failed to fetch events. Please try again.');
+      setError('Failed to fetch events. Please try again.');
       console.error('API Error:', error);
     } finally {
       setIsLoading(false);
@@ -115,7 +102,7 @@ export default function EventsPage() {
       fetchEvents(1, searchTerm).finally(() => {
         setIsInitialLoading(false);
       });
-    }, 1000);
+    }, 300);
 
     return () => clearTimeout(debounceTimer);
   }, [fetchEvents, searchTerm]);
@@ -129,6 +116,12 @@ export default function EventsPage() {
   const handleSearch = (e) => {
     setSearchTerm(e.target.value);
     setCurrentPage(1);
+  };
+
+  const retryFetch = () => {
+    setEvents([]);
+    setCurrentPage(1);
+    fetchEvents(1, searchTerm);
   };
 
   const handleCardClick = (event) => {
@@ -146,9 +139,9 @@ export default function EventsPage() {
 
   return (
     <Container>
-      <h1 className="text-3xl font-bold mb-8">Upcoming Tech Events</h1>
+      <h1 className="text-3xl font-bold mb-8">Available Events</h1>
       <Input
-        placeholder="Search for tech events..."
+        placeholder="Search for events..."
         value={searchTerm}
         onChange={handleSearch}
         className="mb-8"
@@ -157,7 +150,7 @@ export default function EventsPage() {
       {error && (
         <div className="mb-4 text-red-500">
           {error}
-          <Button onClick={() => fetchEvents(1, searchTerm)} className="ml-4">Retry</Button>
+          <Button onClick={retryFetch} className="ml-4">Retry</Button>
         </div>
       )}
       {isLoading ? (
@@ -168,8 +161,8 @@ export default function EventsPage() {
             <EventCard
               key={event.id}
               title={event.title}
-              date={new Date(event.start).toLocaleDateString()}
-              location={event.location.join(', ')}
+              company={event.company}
+              location={event.location}
               description={event.description}
               onClick={() => handleCardClick(event)}
             />
@@ -194,23 +187,16 @@ export default function EventsPage() {
                 <h2 className="text-2xl font-bold">{selectedEvent?.title}</h2>
               </ModalHeader>
               <ModalBody>
-                <p><strong>Date:</strong> {new Date(selectedEvent?.start).toLocaleString()}</p>
-                <p><strong>Location:</strong> {selectedEvent?.location.join(', ')}</p>
+                <p><strong>Company:</strong> {selectedEvent?.company}</p>
+                <p><strong>Location:</strong> {selectedEvent?.location}</p>
                 <p><strong>Description:</strong> {selectedEvent?.description}</p>
-                {selectedEvent?.entities && (
-                  <div>
-                    <h3 className="text-xl font-semibold mt-4 mb-2">Related Entities</h3>
-                    <ul>
-                      {selectedEvent.entities.map((entity, index) => (
-                        <li key={index}>{entity.name} ({entity.type})</li>
-                      ))}
-                    </ul>
-                  </div>
-                )}
               </ModalBody>
               <ModalFooter>
                 <Button color="danger" variant="light" onPress={onClose}>
                   Close
+                </Button>
+                <Button color="primary">
+                  Apply Now
                 </Button>
               </ModalFooter>
             </>
