@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Button, Progress, Card, CardBody, CardHeader } from "@nextui-org/react";
+import { Button, Progress, Card, CardBody, CardHeader, Link } from "@nextui-org/react";
 import Activity from "./Activity";
 import Recommended from "./Recommended";
 import Container from "./pageLayout/Container";
@@ -17,7 +17,7 @@ const Dashboard = () => {
     const fetchUserData = async () => {
       if (session?.user?.email) {
         try {
-          const response = await fetch(`/api/user?email=${session.user.email}`);
+          const response = await fetch(`/api/students?email=${session.user.email}`);
           const userData = await response.json();
           setUser(userData);
         } catch (error) {
@@ -41,26 +41,24 @@ const Dashboard = () => {
 
   return (
     <Container>
-      <Card className="mb-12">
-        <CardBody>
-          <h1 className="text-4xl font-bold mb-4">Welcome back, {user?.fullName || 'User'}!</h1>
-          <p className="mb-8">
-            Let's continue your journey to find the perfect tech internship.
-          </p>
-          <Card>
-            <CardHeader>
-              <h2 className="text-2xl font-bold">Profile Completion</h2>
-            </CardHeader>
-            <CardBody>
-              <Progress color="secondary" value={user?.profileCompleted ? 100 : 70} className="mb-4" />
-              <p>{user?.profileCompleted ? '100' : '70'}% complete</p>
-              <Button href="/student-dashboard/account" className="btnPri mt-4 w-fit">
-                {user?.profileCompleted ? 'View your profile' : 'Complete your profile'}
-              </Button>
-            </CardBody>
-          </Card>
-        </CardBody>
-      </Card>
+      <div className="mb-12">
+        <h1 className="text-4xl font-bold mb-4">Welcome back, {user?.fullName || 'User'}!</h1>
+        <p className="mb-8">
+          Let's continue your journey to find the perfect tech internship.
+        </p>
+        <Card>
+          <CardHeader>
+            <h2 className="text-2xl font-bold">Profile Completion</h2>
+          </CardHeader>
+          <CardBody>
+            <Progress color="secondary" value={user?.profileStrength || 0} className="mb-4" />
+            <p>{user?.profileStrength || 0}% complete</p>
+            <Button as={Link} href="/student-dashboard/account" className="btnPri mt-4 w-fit">
+              {user?.profileStrength === 100 ? 'View your profile' : 'Complete your profile'}
+            </Button>
+          </CardBody>
+        </Card>
+      </div>
       <Activity userEmail={user?.email} />
       <Recommended userProfile={user} />
     </Container>

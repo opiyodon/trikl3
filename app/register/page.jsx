@@ -116,7 +116,16 @@ export default function RegisterPage() {
           fullName: isCompany ? formData.companyName : formData.fullName,
           ...(isCompany
             ? { industry: formData.industry }
-            : { institution: formData.institution, fieldOfStudy: formData.fieldOfStudy }
+            : {
+              institution: formData.institution,
+              fieldOfStudy: formData.fieldOfStudy,
+              yearOfStudy: '',
+              registrationNumber: '',
+              profilePicture: '',
+              course: '',
+              skills: '',
+              bio: ''
+            }
           ),
         }),
       });
@@ -124,9 +133,8 @@ export default function RegisterPage() {
       const data = await res.json();
 
       if (res.ok) {
-        toast.success('Registration successful');
+        toast.success(`Registration successful! Profile strength: ${data.profileStrength}%`);
 
-        // Attempt to sign in the user immediately after successful registration
         const signInResult = await signIn('credentials', {
           redirect: false,
           email: formData.email,

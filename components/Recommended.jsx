@@ -52,22 +52,20 @@ const Recommended = ({ userProfile }) => {
   }
 
   return (
-    <Card>
-      <CardBody>
-        <h2 className="text-2xl font-bold mb-4">Recommended Attachments</h2>
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-          {recommendations.map((rec, index) => (
-            <RecommendedCard
-              key={index}
-              company={rec.employer_name}
-              position={rec.job_title}
-              location={rec.job_city || rec.job_country}
-              jobUrl={rec.job_apply_link}
-            />
-          ))}
-        </div>
-      </CardBody>
-    </Card>
+    <div>
+      <h2 className="text-2xl font-bold mb-4">Recommended Attachments</h2>
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+        {recommendations.map((rec, index) => (
+          <RecommendedCard
+            key={index}
+            company={rec.employer_name}
+            position={rec.job_title}
+            location={rec.job_city || rec.job_country}
+            jobUrl={rec.job_apply_link}
+          />
+        ))}
+      </div>
+    </div>
   );
 };
 

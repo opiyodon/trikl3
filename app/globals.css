@@ -54,3 +54,4 @@ body {
 .btnPri {
     @apply text-light_txt2 bg-pri hover:bg-pri transition duration-300 ease-in-out;
 }
+

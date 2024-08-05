@@ -30,20 +30,18 @@ const Activity = ({ userEmail }) => {
   }
 
   return (
-    <Card className="mb-12">
-      <CardBody>
-        <h2 className="text-2xl font-bold mb-4">Your Recent Activity</h2>
-        {recentActivity.map((activity, index) => (
-          <ActivityCard
-            key={index}
-            title={`Applied to ${activity.attachment.companyName}`}
-            description={`On ${new Date(activity.createdAt).toLocaleDateString()}`}
-            buttonText="View Application"
-            buttonLink={`/student-dashboard/applications/${activity._id}`}
-          />
-        ))}
-      </CardBody>
-    </Card>
+    <div className="mb-12">
+      <h2 className="text-2xl font-bold mb-4">Your Recent Activity</h2>
+      {recentActivity.map((activity, index) => (
+        <ActivityCard
+          key={index}
+          title={`Applied to ${activity.attachment.companyName}`}
+          description={`On ${new Date(activity.createdAt).toLocaleDateString()}`}
+          buttonText="View Application"
+          buttonLink={`/student-dashboard/applications/${activity._id}`}
+        />
+      ))}
+    </div>
   );
 };
 
