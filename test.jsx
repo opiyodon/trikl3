@@ -1,31 +1,19 @@
-import React from 'react';
+import { Button, Link } from "@nextui-org/react";
 
-const CustomIcon = ({ color, size, strokeWidth, ...props }) => (
-  <svg
-    aria-hidden="true"
-    fill="none"
-    focusable="false"
-    height={size}
-    role="presentation"
-    viewBox="0 0 24 24"
-    width={size}
-    {...props}
-  >
-    <path
-      d="M11.5 21C16.7467 21 21 16.7467 21 11.5C21 6.25329 16.7467 2 11.5 2C6.25329 2 2 6.25329 2 11.5C2 16.7467 6.25329 21 11.5 21Z"
-      stroke={color || 'currentColor'} // Customize the stroke color
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      strokeWidth={strokeWidth || 2} // Customize the stroke weight
-    />
-    <path
-      d="M22 22L20 20"
-      stroke={color || 'currentColor'} // Customize the stroke color
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      strokeWidth={strokeWidth || 2} // Customize the stroke weight
-    />
-  </svg>
+const ActivityCard = ({ title, description, buttonText, buttonLink }) => (
+    <div className="bg-white p-6 rounded-lg shadow-md mb-4 flex justify-between items-center border-2 border-gray-300">
+        <div>
+            <h3 className="text-lg font-semibold mb-2">{title}</h3>
+            <p className="mb-0">{description}</p>
+        </div>
+        <Button 
+            as={Link} 
+            href={buttonLink} 
+            className="btnPri ml-4 bg-purple-600 hover:bg-purple-700 text-white"
+        >
+            {buttonText}
+        </Button>
+    </div>
 );
 
-export default CustomIcon;
+export default ActivityCard
