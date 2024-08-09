@@ -64,7 +64,7 @@ const Nav = () => {
       <NavbarContent className="justify-end">
         {status === "authenticated" ? (
           <>
-            <NavItem route="/student-dashboard/post-attachments" name="Post Attachments" isButton={true} />
+            <NavItem route="/student-dashboard/applications" name="Apply for Attachment" isButton={true} />
             <UserProfile />
           </>
         ) : (
