@@ -2,12 +2,12 @@
 
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { Input, Button, Card, CardBody, CardFooter } from "@nextui-org/react";
-import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import Container from '@/components/pageLayout/Container';
 import FuturisticLoader from '@/components/FuturisticLoader';
-import { useSession } from 'next-auth/react'; // Add authentication
+import { useSession } from 'next-auth/react';
 
-const AttachmentCard = ({ company, title, location, description, url, isLocal }) => (
+const AttachmentCard = ({ company, title, location, description, url, isLocal, onApply }) => (
   <Card className="mb-4 h-[300px] flex flex-col">
     <CardBody className="flex-grow overflow-hidden">
       <h3 className="text-lg font-semibold mb-2">{title}</h3>
@@ -15,15 +15,9 @@ const AttachmentCard = ({ company, title, location, description, url, isLocal })
       <p className="text-sm line-clamp-4">{description}</p>
     </CardBody>
     <CardFooter>
-      {isLocal ? (
-        <Link href={`/apply/${url}`} passHref>
-          <Button className="btnPri w-full">Apply Now</Button>
-        </Link>
-      ) : (
-        <Link href={url} passHref target="_blank" rel="noopener noreferrer" className="w-full">
-          <Button className="btnPri w-full">Apply Now</Button>
-        </Link>
-      )}
+      <Button className="btnPri w-full" onClick={() => onApply({ company, title, location, description, url, isLocal })}>
+        Apply Now
+      </Button>
     </CardFooter>
   </Card>
 );
@@ -62,16 +56,17 @@ const API_KEY = process.env.NEXT_PUBLIC_RAPID_API_KEY;
 const cache = new Map();
 
 export default function AttachmentOpportunitiesPage() {
-  const { data: session } = useSession(); // Add authentication session
+  const { data: session } = useSession();
   const [searchTerm, setSearchTerm] = useState('');
   const [opportunities, setOpportunities] = useState([]);
-  const [localOpportunities, setLocalOpportunities] = useState([]); // Add local opportunities
+  const [localOpportunities, setLocalOpportunities] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [isInitialLoading, setIsInitialLoading] = useState(true);
   const [error, setError] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const lastRequestTime = useRef(0);
+  const router = useRouter();
 
   const fetchLocalOpportunities = useCallback(async () => {
     try {
@@ -175,6 +170,10 @@ export default function AttachmentOpportunitiesPage() {
     fetchOpportunities(1, searchTerm);
   };
 
+  const handleApply = (jobDetails) => {
+    router.push(`/student-dashboard/apply?jobDetails=${encodeURIComponent(JSON.stringify(jobDetails))}`);
+  };
+
   if (isInitialLoading) {
     return (
       <Container>
@@ -210,8 +209,9 @@ export default function AttachmentOpportunitiesPage() {
               title={opportunity.position}
               location={opportunity.location}
               description={opportunity.description}
-              url={opportunity._id} // Use the MongoDB ID
+              url={opportunity._id}
               isLocal={true}
+              onApply={handleApply}
             />
           ))}
           {opportunities.map((opportunity) => (
@@ -223,6 +223,7 @@ export default function AttachmentOpportunitiesPage() {
               description={opportunity.job_description}
               url={opportunity.job_apply_link}
               isLocal={false}
+              onApply={handleApply}
             />
           ))}
         </div>

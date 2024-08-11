@@ -67,7 +67,7 @@ const Nav = () => {
         <NavbarContent className="flex-none ml-20">
           {status === "authenticated" ? (
             <div className="flex items-center gap-4">
-              <NavItem route="/student-dashboard/applications" name="Apply for Attachment" isButton={true} />
+              <NavItem route="/student-dashboard/applications" name="View Applications" isButton={true} />
               <UserProfile />
             </div>
           ) : (
