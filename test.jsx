@@ -1,19 +1,43 @@
-import { Button, Link } from "@nextui-org/react";
+import React from "react";
+import { Dropdown, DropdownItem, DropdownTrigger, DropdownMenu, Avatar } from "@nextui-org/react";
+import { signOut } from "next-auth/react";
 
-const ActivityCard = ({ title, description, buttonText, buttonLink }) => (
-    <div className="bg-white p-6 rounded-lg shadow-md mb-4 flex justify-between items-center border-2 border-gray-300">
-        <div>
-            <h3 className="text-lg font-semibold mb-2">{title}</h3>
-            <p className="mb-0">{description}</p>
-        </div>
-        <Button 
-            as={Link} 
-            href={buttonLink} 
-            className="btnPri ml-4 bg-purple-600 hover:bg-purple-700 text-white"
-        >
-            {buttonText}
-        </Button>
-    </div>
-);
+const UserProfile = () => {
+  const handleLogout = async () => {
+    try {
+      await signOut({ callbackUrl: '/' });
+    } catch (error) {
+      console.error("Logout error:", error);
+    }
+  };
 
-export default ActivityCard
+  return (
+    <Dropdown placement="bottom-end">
+      <DropdownTrigger>
+        <Avatar 
+          isBordered 
+          color="secondary" 
+          as="button" 
+          className="transition-transform" 
+          name="Don Artkins" 
+          size="sm" 
+          src="/assets/avatar.png" 
+        />
+      </DropdownTrigger>
+      <DropdownMenu aria-label="Profile Actions" variant="flat">
+        <DropdownItem key="profile" className="h-14 gap-2">
+          <p className="font-semibold">Signed in as</p>
+          <p className="font-semibold">donartkins@gmail.com</p>
+        </DropdownItem>
+        <DropdownItem key="settings" href="/dashboard/account">
+          My Account
+        </DropdownItem>
+        <DropdownItem key="logout" color="danger" onPress={handleLogout}>
+          Log Out
+        </DropdownItem>
+      </DropdownMenu>
+    </Dropdown>
+  );
+};
+
+export default UserProfile;

@@ -1,14 +1,16 @@
 'use client'
 
 import { useState, useEffect, useRef } from 'react';
-import { Input, Button, Avatar, Textarea, Card, CardBody, CardHeader, Divider } from "@nextui-org/react";
+import { Input, Button, Avatar, Textarea, Card, CardBody, CardHeader } from "@nextui-org/react";
 import { useSession } from 'next-auth/react';
 import Container from '@/components/pageLayout/Container';
 import FuturisticLoader from '@/components/FuturisticLoader';
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import { Upload, User, Briefcase, GraduationCap, Hash, Book, Lightbulb, FileText, Mail, Eye, EyeOff } from 'lucide-react';
+import { Upload, User, Briefcase, GraduationCap, Hash, Book, Lightbulb, FileText, Mail, Eye, EyeOff, Trash2Icon } from 'lucide-react';
 import { useRouter } from 'next/navigation';
+import FilePicker from '@/components/FilePicker';
+import convertToBase64 from '@/components/convertToBase64';
 
 export default function AccountPage() {
   const router = useRouter();
@@ -35,15 +37,17 @@ export default function AccountPage() {
       if (session?.user?.email) {
         try {
           const response = await fetch(`/api/students?email=${session.user.email}`);
+          if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+          }
           const data = await response.json();
           setUserData(data);
           setPreviewUrl(data.profilePicture);
-          // Clean and set the skills
           const cleanedSkills = (data.skills || []).map(cleanSkill).filter(skill => skill !== '');
           setSkills(cleanedSkills);
         } catch (error) {
           console.error('Failed to fetch user data:', error);
-          toast.error('Failed to load user data');
+          toast.error(`Failed to load user data: ${error.message}`);
         } finally {
           setIsLoading(false);
         }
@@ -61,16 +65,11 @@ export default function AccountPage() {
     }));
   };
 
-  const handleFileChange = (e) => {
+  const handleFileChange = async (e) => {
     const selectedFile = e.target.files[0];
+    const base64 = await convertToBase64(selectedFile);
     setFile(selectedFile);
-    if (selectedFile) {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setPreviewUrl(reader.result);
-      };
-      reader.readAsDataURL(selectedFile);
-    }
+    setPreviewUrl(base64);
   };
 
   const handleSkillInputChange = (e) => {
@@ -99,40 +98,43 @@ export default function AccountPage() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setIsSubmitting(true);
-    const formData = new FormData();
 
-    Object.keys(userData).forEach(key => {
-      if (userData[key] !== null && userData[key] !== undefined) {
-        formData.append(key, userData[key]);
-      }
-    });
-
-    // Clean the skills before sending
     const cleanedSkills = skills.map(cleanSkill).filter(skill => skill !== '');
-    formData.append('skills', JSON.stringify(cleanedSkills));
-
-    if (file) {
-      formData.append('profilePicture', file);
-    }
 
     try {
       const response = await fetch('/api/students', {
         method: 'PUT',
-        body: formData,
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          fullName: userData.fullName,
+          email: userData.email,
+          institution: userData.institution,
+          fieldOfStudy: userData.fieldOfStudy,
+          yearOfStudy: userData.yearOfStudy,
+          registrationNumber: userData.registrationNumber,
+          course: userData.course,
+          bio: userData.bio,
+          skills: cleanedSkills,
+          profilePicture: previewUrl,
+        }),
       });
 
       if (response.ok) {
         const updatedData = await response.json();
         setUserData(updatedData);
-        // Update skills with cleaned version
         setSkills(cleanedSkills);
+        setPreviewUrl(updatedData.profilePicture);
         toast.success('Profile updated successfully!');
       } else {
-        toast.error('Failed to update profile');
+        const errorData = await response.json();
+        console.error('Error updating profile:', errorData);
+        toast.error(`Failed to update profile: ${errorData.message || 'Unknown error'}`);
       }
     } catch (error) {
       console.error('Error updating profile:', error);
-      toast.error('An error occurred while updating the profile');
+      toast.error(`An error occurred while updating the profile: ${error.message}`);
     } finally {
       setIsSubmitting(false);
     }
@@ -163,11 +165,11 @@ export default function AccountPage() {
         }, 3000);
       } else {
         const data = await response.json();
-        toast.error(data.error || 'Failed to delete account');
+        toast.error(`Failed to delete account: ${data.error || 'Unknown error'}`);
       }
     } catch (error) {
       console.error('Error deleting account:', error);
-      toast.error('An error occurred while deleting the account');
+      toast.error(`An error occurred while deleting the account: ${error.message}`);
     } finally {
       setIsDeleting(false);
     }
@@ -210,19 +212,7 @@ export default function AccountPage() {
                     src={previewUrl || "/assets/avatar.png"}
                     className="w-32 h-32 mb-4"
                   />
-                  <Button className="btnPri my-4">
-                    <label htmlFor="file-upload" className="cursor-pointer flex items-center gap-2">
-                      <Upload size={20} />
-                      Upload Picture
-                    </label>
-                  </Button>
-                  <input
-                    id="file-upload"
-                    type="file"
-                    onChange={handleFileChange}
-                    accept="image/*"
-                    className="hidden"
-                  />
+                  <FilePicker handleFileUpload={handleFileChange} fileName={file ? file.name : 'No file chosen'} />
                 </CardBody>
               </Card>
               <Card className="my-8 px-2 bg-red-100 text-center">
@@ -253,6 +243,7 @@ export default function AccountPage() {
                     color="danger"
                     disabled={isDeleting}
                     onClick={handleDeleteAccount}
+                    startContent={<Trash2Icon />}
                   >
                     {isDeleting ? (
                       <div className="animate-spin rounded-full h-6 w-6 border-t-2 border-b-2 border-white"></div>
@@ -351,7 +342,6 @@ export default function AccountPage() {
                 className="btnPri w-full"
                 type="submit"
                 disabled={isSubmitting}
-                onClick={handleSubmit}
               >
                 {isSubmitting ? (
                   <div className="animate-spin rounded-full h-6 w-6 border-t-2 border-b-2 border-white"></div>
