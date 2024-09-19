@@ -73,7 +73,7 @@ const About = () => {
             </CardHeader>
             <CardBody>
               <p className="mb-4">
-                We partner with top tech companies across Kenya to offer internships that you won't find on any other platform.
+                We partner with top tech companies across Kenya to offer internships that you won&apos;t find on any other platform.
               </p>
               <Image
                 src="https://source.unsplash.com/random/800x600?opportunity,career"
