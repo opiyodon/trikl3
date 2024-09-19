@@ -44,7 +44,7 @@ const Dashboard = () => {
       <div className="mb-12">
         <h1 className="text-4xl font-bold mb-4">Welcome back, {user?.fullName || 'User'}!</h1>
         <p className="mb-8">
-          Let's continue your journey to find the perfect tech internship.
+          Let&apos;s continue your journey to find the perfect tech internship.
         </p>
         <Card>
           <CardHeader>

@@ -157,7 +157,7 @@ export default function LoginPage() {
           ) : `Log In as ${isCompany ? 'Company' : 'Student'}`}
         </Button>
         <p className="text-center">
-          Don't have an account? <Link href="/register" className="text-pri">Sign up</Link>
+          Don&apos;t have an account? <Link href="/register" className="text-pri">Sign up</Link>
         </p>
       </form>
     </div>

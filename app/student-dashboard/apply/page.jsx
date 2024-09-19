@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { Card, CardBody, Input, Textarea, Button, Checkbox, Select, SelectItem } from "@nextui-org/react";
+import { Card, CardBody, Input, Textarea, Button, Checkbox, Select, SelectItem, Image } from "@nextui-org/react";
 import Container from '@/components/pageLayout/Container';
 import { useSession } from 'next-auth/react';
 import { toast, ToastContainer } from 'react-toastify';
@@ -107,7 +107,7 @@ export default function Apply() {
             <p className="whitespace-pre-wrap">{jobDetails.description}</p>
           </div>
           {jobDetails.logoUrl && (
-            <img src={jobDetails.logoUrl} alt={`${jobDetails.company} logo`} className="max-w-xs mx-auto mt-4" />
+            <Image src={jobDetails.logoUrl} alt={`${jobDetails.company} logo`} className="max-w-xs mx-auto mt-4" />
           )}
         </CardBody>
       </Card>

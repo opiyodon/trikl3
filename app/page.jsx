@@ -189,7 +189,7 @@ const LandingPage = () => {
               <h3 className="text-xl font-semibold">Exclusive Opportunities</h3>
             </CardHeader>
             <CardBody>
-              <p className="mb-4">Access internships from top tech companies in Kenya that you won't find anywhere else.</p>
+              <p className="mb-4">Access internships from top tech companies in Kenya that you won&apos;t find anywhere else.</p>
               <Image
                 src="https://images.unsplash.com/photo-1521737852567-6949f3f9f2b5?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=60"
                 alt="Exclusive Opportunities"
