@@ -79,7 +79,7 @@ export default function ApplicationsPage() {
         ))}
       </div>
       {applications.length === 0 && (
-        <p className="text-center text-gray-500 mt-8">You haven't submitted any applications yet.</p>
+        <p className="text-center text-gray-500 mt-8">You haven&apos;t submitted any applications yet.</p>
       )}
 
       <Modal

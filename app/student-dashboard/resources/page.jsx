@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect, useCallback, useRef } from 'react';
-import { Input, Button, Card, CardBody, CardFooter, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, useDisclosure } from "@nextui-org/react";
+import { Input, Button, Card, CardBody, CardFooter, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, useDisclosure, Image } from "@nextui-org/react";
 import { useRouter } from 'next/navigation';
 import Container from '@/components/pageLayout/Container';
 import FuturisticLoader from '@/components/FuturisticLoader';
@@ -9,7 +9,7 @@ import FuturisticLoader from '@/components/FuturisticLoader';
 const ResourceCard = ({ title, description, type, companyName, logoUrl, onClick }) => (
   <Card className="mb-4 h-[300px] flex flex-col hover:shadow-lg transition-shadow duration-300">
     <CardBody className="flex-grow overflow-hidden">
-      {logoUrl && <img src={logoUrl} alt={`${companyName} logo`} className="w-16 h-16 object-contain mb-2" />}
+      {logoUrl && <Image src={logoUrl} alt={`${companyName} logo`} className="w-16 h-16 object-contain mb-2" />}
       <h3 className="text-lg font-semibold mb-2">{title}</h3>
       <p className="text-sm text-gray-500 mb-2">{type} {companyName && `- ${companyName}`}</p>
       <p className="text-sm line-clamp-3">{description}</p>
@@ -286,7 +286,7 @@ export default function ResourcesPage() {
                     )}
 
                     {selectedResource?.employer_logo && (
-                      <img src={selectedResource.employer_logo} alt={`${selectedResource.employer_name} logo`} className="mt-6 max-w-xs mx-auto" />
+                      <Image src={selectedResource.employer_logo} alt={`${selectedResource.employer_name} logo`} className="mt-6 max-w-xs mx-auto" />
                     )}
                   </article>
                 )}
