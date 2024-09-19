@@ -35,10 +35,10 @@ const Activity = ({ userEmail }) => {
       {recentActivity.map((activity, index) => (
         <ActivityCard
           key={index}
-          title={`Applied to ${activity.attachment.companyName}`}
+          title={`Applied to attachment`}
           description={`On ${new Date(activity.createdAt).toLocaleDateString()}`}
           buttonText="View Application"
-          buttonLink={`/student-dashboard/applications/${activity._id}`}
+          buttonLink={`/student-dashboard/applications`}
         />
       ))}
     </div>

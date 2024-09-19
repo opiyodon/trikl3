@@ -1,21 +1,90 @@
 import { connectToDatabase } from '@/lib/mongodb';
 import Application from '@/models/application';
-import Attachment from '@/models/attachment';
 
-export async function GET(req, res) {
+// Helper function to convert file to base64
+async function convertToBase64(file) {
+  const arrayBuffer = await file.arrayBuffer();
+  const buffer = Buffer.from(arrayBuffer);
+  return buffer.toString('base64');
+}
+
+// Handle GET request to retrieve applications
+export async function GET(req) {
   await connectToDatabase();
-  const { email, companyName } = req.query;
-  
+  const { searchParams } = new URL(req.url);
+  const email = searchParams.get('email');
+  const companyName = searchParams.get('companyName');
+
   let applications;
   if (email) {
-    applications = await Application.find({ email }).populate('attachment');
+    applications = await Application.find({ studentEmail: email });
   } else if (companyName) {
-    const attachments = await Attachment.find({ companyName });
-    const attachmentIds = attachments.map(a => a._id);
-    applications = await Application.find({ attachment: { $in: attachmentIds } }).populate('attachment');
+    applications = await Application.find({ 'jobDetails.company': companyName });
   } else {
-    applications = await Application.find({}).populate('attachment');
+    applications = await Application.find({});
   }
 
-  return res.status(200).json(applications);
+  return new Response(JSON.stringify(applications), {
+    headers: { 'Content-Type': 'application/json' },
+    status: 200,
+  });
+}
+
+// Handle POST request to submit a new application
+export async function POST(req) {
+  await connectToDatabase();
+  const formData = await req.formData();
+
+  try {
+    const applicationData = Object.fromEntries(formData);
+
+    // Handle file uploads
+    const resumeFile = formData.get('resume');
+    const coverLetterFile = formData.get('coverLetter');
+
+    if (resumeFile) {
+      applicationData.resume = `data:${resumeFile.type};base64,${await convertToBase64(resumeFile)}`;
+    }
+
+    if (coverLetterFile) {
+      applicationData.coverLetter = `data:${coverLetterFile.type};base64,${await convertToBase64(coverLetterFile)}`;
+    }
+
+    applicationData.jobDetails = JSON.parse(applicationData.jobDetails);
+
+    const newApplication = new Application(applicationData);
+    await newApplication.save();
+
+    return new Response(JSON.stringify({ message: 'Application submitted successfully' }), {
+      headers: { 'Content-Type': 'application/json' },
+      status: 201,
+    });
+  } catch (error) {
+    console.error('Error submitting application:', error);
+    return new Response(JSON.stringify({ message: 'Failed to submit application' }), {
+      headers: { 'Content-Type': 'application/json' },
+      status: 500,
+    });
+  }
+}
+
+// Handle DELETE request to delete an application
+export async function DELETE(req) {
+  await connectToDatabase();
+  const { searchParams } = new URL(req.url);
+  const id = searchParams.get('id');
+
+  try {
+    await Application.findByIdAndDelete(id);
+    return new Response(JSON.stringify({ message: 'Application deleted successfully' }), {
+      headers: { 'Content-Type': 'application/json' },
+      status: 200,
+    });
+  } catch (error) {
+    console.error('Error deleting application:', error);
+    return new Response(JSON.stringify({ message: 'Failed to delete application' }), {
+      headers: { 'Content-Type': 'application/json' },
+      status: 500,
+    });
+  }
 }

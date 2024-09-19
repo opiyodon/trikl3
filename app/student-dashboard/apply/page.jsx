@@ -1,8 +1,8 @@
 'use client'
 
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { Card, CardBody, Input, Textarea, Button, Checkbox, Dropdown, FileInput } from "@nextui-org/react";
+import { Card, CardBody, Input, Textarea, Button, Checkbox, Select, SelectItem } from "@nextui-org/react";
 import Container from '@/components/pageLayout/Container';
 import { useSession } from 'next-auth/react';
 import { toast, ToastContainer } from 'react-toastify';
@@ -16,17 +16,14 @@ export default function Apply() {
   const [jobDetails, setJobDetails] = useState(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [formData, setFormData] = useState({
-    firstName: '',
-    lastName: '',
+    studentName: '',
     email: '',
     phone: '',
     studentId: '',
     course: '',
     yearOfStudy: '',
-    addressLine1: '',
-    addressLine2: '',
-    city: '',
-    county: '',
+    city: 'Nakuru',
+    county: 'Nakuru',
     country: 'Kenya',
     resume: null,
     coverLetter: null,
@@ -47,7 +44,7 @@ export default function Apply() {
   }, [searchParams]);
 
   const handleChange = (e) => {
-    const { name, value, type, checked, files } = e.target;
+    const { name, value, type, checked, files } = e.target || e;
     setFormData(prevState => ({
       ...prevState,
       [name]: type === 'checkbox' ? checked : type === 'file' ? files[0] : value
@@ -59,44 +56,34 @@ export default function Apply() {
     if (!jobDetails) return;
     setIsSubmitting(true);
 
-    // Create a FormData object to handle file uploads
     const formDataToSend = new FormData();
     Object.keys(formData).forEach(key => {
-      if (formData[key] instanceof File) {
-        formDataToSend.append(key, formData[key]);
+      if (key === 'resume' || key === 'coverLetter') {
+        if (formData[key]) {
+          formDataToSend.append(key, formData[key]);
+        }
       } else {
         formDataToSend.append(key, formData[key]);
       }
     });
+    formDataToSend.append('jobDetails', JSON.stringify(jobDetails));
+    formDataToSend.append('studentEmail', session?.user?.email);
 
     try {
       const response = await fetch('/api/applications', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          ...formData,
-          jobDetails: {
-            title: jobDetails.title,
-            company: jobDetails.company || jobDetails.companyName,
-            location: jobDetails.location,
-            description: jobDetails.description,
-            isLocal: jobDetails.isLocal || false,
-            url: jobDetails.url || '',
-            logoUrl: jobDetails.logoUrl || '',
-          },
-          studentEmail: session?.user?.email,
-        }),
-      });      
+        body: formDataToSend,
+      });
 
       if (response.ok) {
         toast.success('Application submitted successfully!');
-        setTimeout(() => router.push('/applications'), 2000);
+        setTimeout(() => router.push('/student-dashboard/applications'), 2000);
       } else {
-        toast.error('Failed to submit application. Please try again.');
+        const errorData = await response.json();
+        toast.error(errorData.message || 'Failed to submit application. Please try again.');
       }
     } catch (error) {
+      console.error('Error submitting application:', error);
       toast.error('An error occurred. Please try again.');
     } finally {
       setIsSubmitting(false);
@@ -113,31 +100,27 @@ export default function Apply() {
       <h1 className="text-3xl font-bold mb-8">Apply for {jobDetails.title}</h1>
       <Card className="mb-8">
         <CardBody>
-          <h2 className="text-2xl font-semibold mb-4">{jobDetails.company || jobDetails.companyName}</h2>
+          <h2 className="text-2xl font-semibold mb-4">{jobDetails.company}</h2>
           <h3 className="text-xl font-medium mb-2">Location: {jobDetails.location}</h3>
           <div className="mb-4">
             <h4 className="text-lg font-medium mb-2">Job Description:</h4>
             <p className="whitespace-pre-wrap">{jobDetails.description}</p>
           </div>
+          {jobDetails.logoUrl && (
+            <img src={jobDetails.logoUrl} alt={`${jobDetails.company} logo`} className="max-w-xs mx-auto mt-4" />
+          )}
         </CardBody>
       </Card>
+      <h1 className="text-3xl font-bold mb-8">Application Form</h1>
       <form onSubmit={handleSubmit}>
-        <div className="grid grid-cols-2 gap-4 mb-4">
-          <Input
-            label="First Name"
-            name="firstName"
-            value={formData.firstName}
-            onChange={handleChange}
-            required
-          />
-          <Input
-            label="Last Name"
-            name="lastName"
-            value={formData.lastName}
-            onChange={handleChange}
-            required
-          />
-        </div>
+        <Input
+          label="Full Name"
+          name="studentName"
+          value={formData.studentName}
+          onChange={handleChange}
+          className="mb-4"
+          required
+        />
         <Input
           label="Email"
           name="email"
@@ -183,22 +166,7 @@ export default function Apply() {
           className="mb-4"
           required
         />
-        <div className="grid grid-cols-2 gap-4 mb-4">
-          <Input
-            label="Address Line 1"
-            name="addressLine1"
-            value={formData.addressLine1}
-            onChange={handleChange}
-            required
-          />
-          <Input
-            label="Address Line 2"
-            name="addressLine2"
-            value={formData.addressLine2}
-            onChange={handleChange}
-          />
-        </div>
-        <div className="grid grid-cols-3 gap-4 mb-4">
+        <div className="grid grid-cols-3 gap-4 mb-10">
           <Input
             label="City"
             name="city"
@@ -221,15 +189,17 @@ export default function Apply() {
             required
           />
         </div>
-        <FileInput
+        <Input
+          type="file"
           label="Resume/CV"
           name="resume"
           onChange={handleChange}
           accept=".pdf,.doc,.docx"
-          className="mb-4"
+          className="mb-10"
           required
         />
-        <FileInput
+        <Input
+          type="file"
           label="Cover Letter"
           name="coverLetter"
           onChange={handleChange}
@@ -250,19 +220,19 @@ export default function Apply() {
           onChange={handleChange}
           className="mb-4"
         />
-        <Dropdown
+        <Select
           label="Preferred Attachment Period"
           name="preferredAttachmentPeriod"
+          placeholder="Select a period"
           value={formData.preferredAttachmentPeriod}
-          onChange={handleChange}
+          onChange={(value) => handleChange({ target: { name: 'preferredAttachmentPeriod', value } })}
           className="mb-4"
           required
         >
-          <option value="">Select a period</option>
-          <option value="May-August">May-August</option>
-          <option value="September-December">September-December</option>
-          <option value="January-April">January-April</option>
-        </Dropdown>
+          <SelectItem key="May-August" value="May-August">May-August</SelectItem>
+          <SelectItem key="September-December" value="September-December">September-December</SelectItem>
+          <SelectItem key="January-April" value="January-April">January-April</SelectItem>
+        </Select>
         <Textarea
           label="Skills"
           name="skills"

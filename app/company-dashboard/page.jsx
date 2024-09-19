@@ -1,27 +1,52 @@
 'use client'
 
 import { useState, useEffect } from 'react';
-import { Card, CardBody, CardFooter, Button } from "@nextui-org/react";
+import { Card, CardBody, CardFooter, Button, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, useDisclosure } from "@nextui-org/react";
 import Container from '@/components/pageLayout/Container';
-import { useSession } from 'next-auth/react'; // Add authentication
+import { useSession } from 'next-auth/react';
+import { toast, ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
-const ApplicationCard = ({ application, updateStatus }) => (
-  <Card className="mb-4 h-[200px] flex flex-col">
-    <CardBody className="flex-grow overflow-hidden">
-      <h3 className="text-lg font-semibold mb-2">{application.studentName}</h3>
-      <p className="text-sm text-gray-500 mb-2">{application.email}</p>
-      <p className="text-sm line-clamp-4">{application.message}</p>
-      <p className="text-sm font-semibold">Status: {application.status}</p>
-    </CardBody>
-    <CardFooter>
-      <Button onClick={() => updateStatus(application._id, 'Accepted')} className="mr-2">Accept</Button>
-      <Button onClick={() => updateStatus(application._id, 'Rejected')} color="error">Reject</Button>
-    </CardFooter>
-  </Card>
-);
+const ApplicationCard = ({ application, updateStatus }) => {
+  const { isOpen, onOpen, onClose } = useDisclosure();
+
+  return (
+    <Card className="mb-4 flex flex-col">
+      <CardBody className="flex-grow overflow-hidden">
+        <h3 className="text-lg font-semibold mb-2">{application.studentName}</h3>
+        <p className="text-sm text-gray-500 mb-2">{application.email}</p>
+        <p className="text-sm line-clamp-2">{application.jobDetails.title}</p>
+        <p className="text-sm font-semibold">Status: {application.status}</p>
+      </CardBody>
+      <CardFooter>
+        <Button onClick={onOpen} className="mr-2">View Details</Button>
+        <Button onClick={() => updateStatus(application._id, 'Accepted')} className="mr-2">Accept</Button>
+        <Button onClick={() => updateStatus(application._id, 'Rejected')} color="error">Reject</Button>
+      </CardFooter>
+
+      <Modal isOpen={isOpen} onClose={onClose}>
+        <ModalContent>
+          <ModalHeader>{application.jobDetails.title}</ModalHeader>
+          <ModalBody>
+            <p><strong>Applicant:</strong> {application.studentName}</p>
+            <p><strong>Email:</strong> {application.email}</p>
+            <p><strong>Company:</strong> {application.jobDetails.company}</p>
+            <p><strong>Location:</strong> {application.jobDetails.location}</p>
+            <p><strong>Message:</strong> {application.message}</p>
+          </ModalBody>
+          <ModalFooter>
+            <Button color="danger" variant="light" onPress={onClose}>
+              Close
+            </Button>
+          </ModalFooter>
+        </ModalContent>
+      </Modal>
+    </Card>
+  );
+};
 
 export default function Dashboard() {
-  const { data: session } = useSession(); // Add authentication session
+  const { data: session } = useSession();
   const [applications, setApplications] = useState([]);
 
   useEffect(() => {
@@ -47,19 +72,21 @@ export default function Dashboard() {
       });
 
       if (response.ok) {
-        setApplications(prevApplications => prevApplications.map(app => 
+        setApplications(prevApplications => prevApplications.map(app =>
           app._id === applicationId ? { ...app, status } : app
         ));
+        toast.success(`Application status updated to ${status}`);
       } else {
-        console.error('Failed to update application status.');
+        toast.error('Failed to update application status.');
       }
     } catch (error) {
-      console.error('Failed to update application status:', error);
+      toast.error('Failed to update application status.');
     }
   };
 
   return (
     <Container>
+      <ToastContainer position="top-right" autoClose={5000} />
       <h1 className="text-3xl font-bold mb-8">Dashboard</h1>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         {applications.map(application => (

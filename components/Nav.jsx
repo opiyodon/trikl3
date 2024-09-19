@@ -39,7 +39,6 @@ const Nav = () => {
       <NavItem route="/student-dashboard" name="Dashboard" activeItem={activeItem} />
       <NavItem route="/student-dashboard/attachments" name="Attachments" activeItem={activeItem} />
       <NavItem route="/student-dashboard/resources" name="Resources" activeItem={activeItem} />
-      <NavItem route="/student-dashboard/events" name="Events" activeItem={activeItem} />
     </>
   );
 
@@ -67,7 +66,7 @@ const Nav = () => {
         <NavbarContent className="flex-none ml-20">
           {status === "authenticated" ? (
             <div className="flex items-center gap-4">
-              <NavItem route="/student-dashboard/applications" name="Apply for Attachment" isButton={true} />
+              <NavItem route="/student-dashboard/applications" name="View Applications" isButton={true} />
               <UserProfile />
             </div>
           ) : (
