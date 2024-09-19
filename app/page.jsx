@@ -205,7 +205,7 @@ const LandingPage = () => {
         <Card>
           <CardBody>
             <blockquote className="italic mb-4">
-              "Trikl3 helped me land my dream internship at a leading tech company in Nairobi. The AI-driven recommendations were spot on!"
+              &quot;Trikl3 helped me land my dream internship at a leading tech company in Nairobi. The AI-driven recommendations were spot on!&quot;
             </blockquote>
             <p className="font-semibold">- Oketch M., IT Student</p>
           </CardBody>
