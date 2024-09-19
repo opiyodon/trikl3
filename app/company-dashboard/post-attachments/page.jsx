@@ -1,105 +1,104 @@
 'use client'
 
 import { useState } from 'react';
-import { Input, Textarea, Button, Select, SelectItem } from "@nextui-org/react";
-import { useSession } from 'next-auth/react'; // Add authentication
+import { useRouter } from 'next/router';
+import { Card, CardBody, Button, Input, Textarea } from "@nextui-org/react";
+import Container from '@/components/pageLayout/Container';
+import { useSession } from 'next-auth/react';
+import { toast, ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
-export default function PostInternshipPage() {
-  const { data: session } = useSession(); // Add authentication session
-  const [formData, setFormData] = useState({
-    companyName: session?.user?.name || '', // Use authenticated user's company name if available
-    position: '',
+export default function PostAttachment() {
+  const router = useRouter();
+  const { data: session } = useSession();
+  const [attachment, setAttachment] = useState({
+    title: '',
     location: '',
     description: '',
     requirements: '',
     duration: '',
+    startDate: '',
+    stipend: ''
   });
-
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setFormData(prevState => ({
-      ...prevState,
-      [name]: value
-    }));
-  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
       const response = await fetch('/api/attachments', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(formData)
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          ...attachment,
+          companyEmail: session?.user?.email
+        })
       });
 
       if (response.ok) {
-        alert('Internship posted successfully!');
+        toast.success('Attachment posted successfully');
+        router.push('/company-dashboard/attachments');
       } else {
-        alert('Failed to post internship.');
+        toast.error('Failed to post attachment');
       }
     } catch (error) {
-      console.error('Failed to post internship:', error);
-      alert('Failed to post internship.');
+      toast.error('Failed to post attachment');
     }
   };
 
   return (
-    <div className="container mx-auto px-4 py-8">
-      <h1 className="text-3xl font-bold mb-8">Post an Internship</h1>
-      <form onSubmit={handleSubmit} className="max-w-2xl mx-auto">
-        <Input
-          label="Company Name"
-          name="companyName"
-          value={formData.companyName}
-          onChange={handleChange}
-          className="mb-4"
-          disabled // Disable input if company name is pre-filled
-        />
-        <Input
-          label="Position"
-          name="position"
-          value={formData.position}
-          onChange={handleChange}
-          className="mb-4"
-        />
-        <Input
-          label="Location"
-          name="location"
-          value={formData.location}
-          onChange={handleChange}
-          className="mb-4"
-        />
-        <Textarea
-          label="Description"
-          name="description"
-          value={formData.description}
-          onChange={handleChange}
-          className="mb-4"
-        />
-        <Textarea
-          label="Requirements"
-          name="requirements"
-          value={formData.requirements}
-          onChange={handleChange}
-          className="mb-4"
-        />
-        <Select
-          label="Duration"
-          name="duration"
-          value={formData.duration}
-          onChange={handleChange}
-          className="mb-4"
-        >
-          <SelectItem value="3 months">3 months</SelectItem>
-          <SelectItem value="6 months">6 months</SelectItem>
-          <SelectItem value="12 months">12 months</SelectItem>
-        </Select>
-        <Button type="submit" color="primary">
-          Post Internship
-        </Button>
-      </form>
-    </div>
+    <Container>
+      <ToastContainer position="top-right" autoClose={5000} />
+      <h1 className="text-3xl font-bold mb-8">Post New Attachment</h1>
+      <Card>
+        <CardBody>
+          <form onSubmit={handleSubmit}>
+            <Input
+              label="Title"
+              value={attachment.title}
+              onChange={(e) => setAttachment({...attachment, title: e.target.value})}
+              className="mb-4"
+            />
+            <Input
+              label="Location"
+              value={attachment.location}
+              onChange={(e) => setAttachment({...attachment, location: e.target.value})}
+              className="mb-4"
+            />
+            <Textarea
+              label="Description"
+              value={attachment.description}
+              onChange={(e) => setAttachment({...attachment, description: e.target.value})}
+              className="mb-4"
+            />
+            <Textarea
+              label="Requirements"
+              value={attachment.requirements}
+              onChange={(e) => setAttachment({...attachment, requirements: e.target.value})}
+              className="mb-4"
+            />
+            <Input
+              label="Duration (in weeks)"
+              type="number"
+              value={attachment.duration}
+              onChange={(e) => setAttachment({...attachment, duration: e.target.value})}
+              className="mb-4"
+            />
+            <Input
+              label="Start Date"
+              type="date"
+              value={attachment.startDate}
+              onChange={(e) => setAttachment({...attachment, startDate: e.target.value})}
+              className="mb-4"
+            />
+            <Input
+              label="Stipend (optional)"
+              value={attachment.stipend}
+              onChange={(e) => setAttachment({...attachment, stipend: e.target.value})}
+              className="mb-4"
+            />
+            <Button color="primary" type="submit">Post Attachment</Button>
+          </form>
+        </CardBody>
+      </Card>
+    </Container>
   );
 }
