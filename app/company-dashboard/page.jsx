@@ -1,73 +1,43 @@
 'use client'
 
 import { useState, useEffect } from 'react';
-import { Card, CardBody, CardFooter, Button, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, useDisclosure } from "@nextui-org/react";
+import { Card, CardBody, CardFooter, Button } from "@nextui-org/react";
 import Container from '@/components/pageLayout/Container';
 import { useSession } from 'next-auth/react';
+import Link from 'next/link';
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-
-const ApplicationCard = ({ application, updateStatus }) => {
-  const { isOpen, onOpen, onClose } = useDisclosure();
-
-  return (
-    <Card className="mb-4 flex flex-col">
-      <CardBody className="flex-grow overflow-hidden">
-        <h3 className="text-lg font-semibold mb-2">{application.studentName}</h3>
-        <p className="text-sm text-gray-500 mb-2">{application.email}</p>
-        <p className="text-sm line-clamp-2">{application.jobDetails.title}</p>
-        <p className="text-sm font-semibold">Status: {application.status}</p>
-      </CardBody>
-      <CardFooter>
-        <Button onClick={onOpen} className="mr-2">View Details</Button>
-        <Button onClick={() => updateStatus(application._id, 'Accepted')} className="mr-2">Accept</Button>
-        <Button onClick={() => updateStatus(application._id, 'Rejected')} color="error">Reject</Button>
-      </CardFooter>
-
-      <Modal isOpen={isOpen} onClose={onClose}>
-        <ModalContent>
-          <ModalHeader>{application.jobDetails.title}</ModalHeader>
-          <ModalBody>
-            <p><strong>Applicant:</strong> {application.studentName}</p>
-            <p><strong>Email:</strong> {application.email}</p>
-            <p><strong>Company:</strong> {application.jobDetails.company}</p>
-            <p><strong>Location:</strong> {application.jobDetails.location}</p>
-            <p><strong>Message:</strong> {application.message}</p>
-          </ModalBody>
-          <ModalFooter>
-            <Button color="danger" variant="light" onPress={onClose}>
-              Close
-            </Button>
-          </ModalFooter>
-        </ModalContent>
-      </Modal>
-    </Card>
-  );
-};
+import ApplicationCard from '@/components/admin/ApplicationCard';
 
 export default function Dashboard() {
   const { data: session } = useSession();
   const [applications, setApplications] = useState([]);
+  const [companyProfile, setCompanyProfile] = useState(null);
 
   useEffect(() => {
-    const fetchApplications = async () => {
-      const response = await fetch(`/api/applications?companyName=${session?.user?.name}`);
-      const data = await response.json();
-      setApplications(data);
+    const fetchData = async () => {
+      if (session?.user?.email) {
+        const [applicationsResponse, profileResponse] = await Promise.all([
+          fetch(`/api/applications?companyEmail=${session.user.email}`),
+          fetch(`/api/companies?email=${session.user.email}`)
+        ]);
+
+        const applicationsData = await applicationsResponse.json();
+        const profileData = await profileResponse.json();
+
+        setApplications(applicationsData);
+        setCompanyProfile(profileData);
+      }
     };
 
-    if (session) {
-      fetchApplications();
-    }
+    fetchData();
   }, [session]);
 
   const updateStatus = async (applicationId, status) => {
     try {
       const response = await fetch(`/api/applications/${applicationId}`, {
         method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json'
-        },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ status })
       });
 
@@ -87,12 +57,51 @@ export default function Dashboard() {
   return (
     <Container>
       <ToastContainer position="top-right" autoClose={5000} />
-      <h1 className="text-3xl font-bold mb-8">Dashboard</h1>
+      <h1 className="text-3xl font-bold mb-8">Company Dashboard</h1>
+
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+        <Card>
+          <CardBody>
+            <h2 className="text-xl font-semibold mb-2">Company Profile</h2>
+            <p>Name: {companyProfile?.name || 'Not set'}</p>
+            <p>Email: {companyProfile?.email || 'Not set'}</p>
+            <p>Industry: {companyProfile?.industry || 'Not set'}</p>
+          </CardBody>
+          <CardFooter>
+            <Link href="/company-dashboard/account">
+              <Button color="primary">Edit Profile</Button>
+            </Link>
+          </CardFooter>
+        </Card>
+
+        <Card>
+          <CardBody>
+            <h2 className="text-xl font-semibold mb-2">Quick Actions</h2>
+            <div className="flex flex-col gap-2">
+              <Link href="/company-dashboard/post-attachment">
+                <Button color="success" className="w-full">Post New Attachment</Button>
+              </Link>
+              <Link href="/company-dashboard/attachments">
+                <Button color="secondary" className="w-full">View All Attachments</Button>
+              </Link>
+            </div>
+          </CardBody>
+        </Card>
+      </div>
+
+      <h2 className="text-2xl font-semibold mb-4">Recent Applications</h2>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-        {applications.map(application => (
+        {applications.slice(0, 6).map(application => (
           <ApplicationCard key={application._id} application={application} updateStatus={updateStatus} />
         ))}
       </div>
+      {applications.length > 6 && (
+        <div className="mt-4 text-center">
+          <Link href="/company-dashboard/applications">
+            <Button color="primary">View All Applications</Button>
+          </Link>
+        </div>
+      )}
     </Container>
   );
 }
