@@ -1,7 +1,8 @@
 'use client'
 
 import { useState, useEffect, useCallback, useRef } from 'react';
-import { Input, Button, Card, CardBody, CardFooter, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, useDisclosure, Link } from "@nextui-org/react";
+import { Input, Button, Card, CardBody, CardFooter, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, useDisclosure } from "@nextui-org/react";
+import { useRouter } from 'next/navigation';
 import Container from '@/components/pageLayout/Container';
 import FuturisticLoader from '@/components/FuturisticLoader';
 
@@ -66,6 +67,7 @@ export default function ResourcesPage() {
   const { isOpen, onOpen, onClose } = useDisclosure();
   const [selectedResource, setSelectedResource] = useState(null);
   const [isModalLoading, setIsModalLoading] = useState(false);
+  const router = useRouter();
 
   const fetchResources = useCallback(async (page, search = '') => {
     setIsLoading(true);
@@ -185,11 +187,15 @@ export default function ResourcesPage() {
   };
 
   const formatJobDescription = (description) => {
-    // This is a simple formatting function. You may need to adjust it based on the actual structure of your job descriptions.
     const paragraphs = description.split('\n\n');
     return paragraphs.map((paragraph, index) => (
       <p key={index} className="mb-4">{paragraph}</p>
     ));
+  };
+
+  const handleApply = (jobDetails) => {
+    const encodedJobDetails = encodeURIComponent(JSON.stringify(jobDetails));
+    router.push(`/student-dashboard/apply?jobDetails=${encodedJobDetails}`);
   };
 
   if (isInitialLoading) {
@@ -260,9 +266,6 @@ export default function ResourcesPage() {
                       <h3 className="text-xl font-semibold mb-2">Job Details</h3>
                       <p><strong>Location:</strong> {selectedResource?.job_city}, {selectedResource?.job_country}</p>
                       <p><strong>Job Type:</strong> {selectedResource?.job_employment_type}</p>
-                      {selectedResource?.job_apply_link && (
-                        <p><strong>Apply:</strong> <a href={selectedResource.job_apply_link} target="_blank" rel="noopener noreferrer">Application Link</a></p>
-                      )}
                     </section>
 
                     <section className="mt-6">
@@ -289,9 +292,22 @@ export default function ResourcesPage() {
                 )}
               </ModalBody>
               <ModalFooter>
-                <Link href={selectedResource?.job_apply_link} passHref target="_blank" rel="noopener noreferrer" className="w-full">
-                  <Button className="btnPri w-full">Apply Now</Button>
-                </Link>
+                <Button
+                  className="btnPri w-full"
+                  onClick={() => {
+                    onClose();
+                    handleApply({
+                      company: selectedResource.employer_name,
+                      title: selectedResource.job_title,
+                      location: `${selectedResource.job_city}, ${selectedResource.job_country}`,
+                      description: selectedResource.job_description,
+                      url: selectedResource.job_apply_link,
+                      isLocal: false
+                    });
+                  }}
+                >
+                  Apply Now
+                </Button>
                 <Button className="w-full" color="danger" variant="light" onPress={onClose}>
                   Close
                 </Button>

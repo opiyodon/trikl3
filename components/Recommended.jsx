@@ -59,9 +59,11 @@ const Recommended = ({ userProfile }) => {
           <RecommendedCard
             key={index}
             company={rec.employer_name}
-            position={rec.job_title}
+            title={rec.job_title}
             location={rec.job_city || rec.job_country}
-            jobUrl={rec.job_apply_link}
+            description={rec.job_description}
+            url={rec.job_apply_link}
+            isLocal={false}
           />
         ))}
       </div>

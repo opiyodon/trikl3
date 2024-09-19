@@ -270,7 +270,9 @@ export default function Apply() {
           className="btnPri w-full"
           disabled={isSubmitting || !formData.agreeToTerms}
         >
-          {isSubmitting ? <FuturisticLoader size="sm" /> : 'Submit Application'}
+          {isSubmitting ? (
+            <div className="animate-spin rounded-full h-6 w-6 border-t-2 border-b-2 border-white"></div>
+          ) : 'Submit Application'}
         </Button>
       </form>
     </Container>

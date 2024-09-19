@@ -6,6 +6,8 @@ import { useRouter } from 'next/navigation';
 import Container from '@/components/pageLayout/Container';
 import FuturisticLoader from '@/components/FuturisticLoader';
 import { useSession } from 'next-auth/react';
+import { toast, ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 const AttachmentCard = ({ company, title, location, description, url, isLocal, onApply }) => (
   <Card className="mb-4 h-[300px] flex flex-col">
@@ -75,6 +77,7 @@ export default function AttachmentOpportunitiesPage() {
       setLocalOpportunities(data);
     } catch (error) {
       console.error('Failed to fetch local opportunities:', error);
+      toast.error('Failed to fetch local opportunities. Please try again.');
     }
   }, []);
 
@@ -134,6 +137,7 @@ export default function AttachmentOpportunitiesPage() {
     } catch (error) {
       setError(error.message || 'Failed to fetch opportunities. Please try again.');
       console.error('API Error:', error);
+      toast.error('Failed to fetch opportunities. Please try again.');
     } finally {
       setIsLoading(false);
     }
@@ -184,6 +188,7 @@ export default function AttachmentOpportunitiesPage() {
 
   return (
     <Container>
+      <ToastContainer position="top-right" autoClose={5000} />
       <h1 className="text-3xl font-bold mb-8">Student Attachment Opportunities in Kenya</h1>
       <Input
         placeholder="Search by job title, course, location, or company..."

@@ -1,6 +1,5 @@
 import { connectToDatabase } from '@/lib/mongodb';
 import Application from '@/models/application';
-import nodemailer from 'nodemailer';
 
 // Helper function to convert file to base64
 async function convertToBase64(file) {
@@ -37,23 +36,24 @@ export async function POST(req) {
   const formData = await req.formData();
 
   try {
+    const applicationData = Object.fromEntries(formData);
+
+    // Handle file uploads
     const resumeFile = formData.get('resume');
     const coverLetterFile = formData.get('coverLetter');
 
-    const resumeBase64 = await convertToBase64(resumeFile);
-    const coverLetterBase64 = coverLetterFile ? await convertToBase64(coverLetterFile) : null;
-
-    const applicationData = Object.fromEntries(formData);
-    applicationData.resume = `data:${resumeFile.type};base64,${resumeBase64}`;
-    if (coverLetterBase64) {
-      applicationData.coverLetter = `data:${coverLetterFile.type};base64,${coverLetterBase64}`;
+    if (resumeFile) {
+      applicationData.resume = `data:${resumeFile.type};base64,${await convertToBase64(resumeFile)}`;
     }
+
+    if (coverLetterFile) {
+      applicationData.coverLetter = `data:${coverLetterFile.type};base64,${await convertToBase64(coverLetterFile)}`;
+    }
+
     applicationData.jobDetails = JSON.parse(applicationData.jobDetails);
 
     const newApplication = new Application(applicationData);
     await newApplication.save();
-
-    await sendEmailToCompany(applicationData);
 
     return new Response(JSON.stringify({ message: 'Application submitted successfully' }), {
       headers: { 'Content-Type': 'application/json' },
@@ -87,36 +87,4 @@ export async function DELETE(req) {
       status: 500,
     });
   }
-}
-
-// Function to send an email to the company
-async function sendEmailToCompany(applicationData) {
-  const transporter = nodemailer.createTransport({
-    host: process.env.NODEMAILER_HOST,
-    port: process.env.NODEMAILER_PORT,
-    secure: process.env.NODEMAILER_PORT === '465', // true for 465, false for other ports
-    auth: {
-      user: process.env.NODEMAILER_USER,
-      pass: process.env.NODEMAILER_PASS,
-    },
-  });
-
-  const mailOptions = {
-    from: applicationData.email,
-    to: applicationData.jobDetails.company,
-    subject: `New Application for ${applicationData.jobDetails.title}`,
-    html: `
-      <h1>New Application Received</h1>
-      <p>A student has applied for the position of ${applicationData.jobDetails.title} through Trikl3.</p>
-      <p>Student Name: ${applicationData.studentName}</p>
-      <p>Email: ${applicationData.email}</p>
-      ${applicationData.jobDetails.isLocal ? `
-        <p>You can view and manage this application by logging into your Trikl3 account:</p>
-        <a href="https://trikl3.com/company-dashboard">View Application</a>
-      ` : ''}
-      <p>Resume and cover letter (if provided) are stored in the application details.</p>
-    `,
-  };
-
-  await transporter.sendMail(mailOptions);
 }

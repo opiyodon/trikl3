@@ -39,7 +39,6 @@ const Nav = () => {
       <NavItem route="/student-dashboard" name="Dashboard" activeItem={activeItem} />
       <NavItem route="/student-dashboard/attachments" name="Attachments" activeItem={activeItem} />
       <NavItem route="/student-dashboard/resources" name="Resources" activeItem={activeItem} />
-      <NavItem route="/student-dashboard/events" name="Events" activeItem={activeItem} />
     </>
   );
 

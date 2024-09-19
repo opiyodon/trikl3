@@ -1,38 +1,60 @@
-import { useState } from 'react';
-import { Card, CardBody, CardFooter, Image } from "@nextui-org/react";
+import { useState, useEffect } from 'react';
+import { Card, CardBody, CardFooter, Button } from "@nextui-org/react";
+import Image from 'next/image';
+import { useRouter } from 'next/navigation';
 
-const RecommendedCard = ({ company, position, location, jobUrl }) => {
-  const [imageError, setImageError] = useState(false);
+const UNSPLASH_ACCESS_KEY = process.env.NEXT_PUBLIC_UNSPLASH_ACCESS_KEY;
 
-  const getImageUrl = () => {
-    if (imageError) {
-      // Fallback to a generic image or company initial
-      return `https://ui-avatars.com/api/?name=${encodeURIComponent(company)}&background=random&color=fff`;
-    }
-    return `https://logo.clearbit.com/${company.toLowerCase().replace(/\s/g, '')}.com`;
+const RecommendedCard = ({ company, title, location, description, url, isLocal }) => {
+  const [imageUrl, setImageUrl] = useState('/default.png');
+  const router = useRouter();
+
+  useEffect(() => {
+    const fetchImage = async () => {
+      const imageQuery = encodeURIComponent(`${title.split(' ')[0]} office`);
+      try {
+        const response = await fetch(`https://api.unsplash.com/photos/random?query=${imageQuery}&client_id=${UNSPLASH_ACCESS_KEY}`);
+        const data = await response.json();
+        setImageUrl(data.urls.regular);
+      } catch (error) {
+        console.error('Error fetching image:', error);
+        setImageUrl('/default.png');
+      }
+    };
+
+    fetchImage();
+  }, [title]);
+
+  const handleApply = () => {
+    const jobDetails = { company, title, location, description, url, isLocal };
+    const encodedJobDetails = encodeURIComponent(JSON.stringify(jobDetails));
+    router.push(`/student-dashboard/apply?jobDetails=${encodedJobDetails}`);
   };
 
   return (
-    <Card
-      isPressable
-      isHoverable
-      onPress={() => window.open(jobUrl, '_blank', 'noopener,noreferrer')}
-      className="cursor-pointer h-[300px] flex flex-col"
-    >
+    <Card className="h-full flex flex-col">
       <CardBody className="p-0 flex-grow">
-        <div className="relative w-full h-full">
-          <Image
-            src={getImageUrl()}
-            alt={`${company} logo`}
-            className="absolute inset-0 w-full h-full object-cover"
-            onError={() => setImageError(true)}
-          />
+        <div className="relative w-full h-48">
+          {imageUrl && (
+            <Image
+              src={imageUrl}
+              alt={`Job image for ${title} at ${company}`}
+              layout="fill"
+              objectFit="cover"
+              onError={() => setImageUrl('/default.png')}
+            />
+          )}
+        </div>
+        <div className="p-3">
+          <h3 className="text-lg font-semibold mb-1 truncate">{title}</h3>
+          <p className="text-sm text-gray-500 mb-1 truncate">{company} - {location}</p>
+          <p className="text-sm line-clamp-3">{description}</p>
         </div>
       </CardBody>
-      <CardFooter className="flex-col items-start bg-white bg-opacity-90 absolute bottom-0 left-0 right-0 p-3">
-        <h4 className="font-semibold text-lg truncate w-full">{position}</h4>
-        <p className="text-sm text-default-500 truncate w-full">{company}</p>
-        <p className="text-xs text-default-400 truncate w-full">{location}</p>
+      <CardFooter>
+        <Button onClick={handleApply} className="w-full btnPri">
+          Apply Now
+        </Button>
       </CardFooter>
     </Card>
   );
