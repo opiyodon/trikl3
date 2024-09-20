@@ -7,7 +7,7 @@ import { useSession } from 'next-auth/react';
 import Link from 'next/link';
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import ApplicationCard from '@/components/admin/ApplicationCard';
+import ApplicationCard from '@/components/company/ApplicationCard';
 
 export default function Dashboard() {
   const { data: session } = useSession();

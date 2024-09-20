@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react';
-import { Input, Button, Checkbox, Link, Switch, Progress } from "@nextui-org/react";
+import { Input, Button, Checkbox, Link, Switch } from "@nextui-org/react";
 import { useRouter } from 'next/navigation';
 import { signIn } from 'next-auth/react';
 import { toast, ToastContainer } from 'react-toastify';
@@ -55,9 +55,14 @@ export default function LoginPage() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    // Validate fields before submitting
     const newErrors = {};
     Object.keys(formData).forEach(key => validateField(key, formData[key]));
-    if (Object.keys(errors).length > 0) {
+
+    // Check if there are errors before submission
+    if (Object.keys(newErrors).length > 0) {
+      setErrors(newErrors); // Set errors to state
       toast.error('Please correct the errors in the form');
       return;
     }
