@@ -1,8 +1,8 @@
-'use client'
+'use client';
 
 import { useState, useEffect } from 'react';
 import { Input, Button, Checkbox, Link, Switch, Progress } from "@nextui-org/react";
-import { useRouter } from 'next/navigation';
+import { useRouter } from 'next/navigation'; // Correct router import
 import { signIn } from 'next-auth/react';
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
@@ -30,15 +30,17 @@ export default function RegisterPage() {
   const [errors, setErrors] = useState({});
   const router = useRouter();
 
+  // Simulate loading effect
   useEffect(() => {
     setTimeout(() => setIsLoading(false), 1500);
   }, []);
 
+  // Handle form change and field validation
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
-    setFormData(prevState => ({
+    setFormData((prevState) => ({
       ...prevState,
-      [name]: type === 'checkbox' ? checked : value
+      [name]: type === 'checkbox' ? checked : value,
     }));
     if (name === 'password') {
       setPasswordStrength(calculatePasswordStrength(value));
@@ -94,10 +96,14 @@ export default function RegisterPage() {
     return 'success';
   };
 
+  // Form submit logic
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    // Validate all fields before proceeding
     const newErrors = {};
-    Object.keys(formData).forEach(key => validateField(key, formData[key]));
+    Object.keys(formData).forEach((key) => validateField(key, formData[key]));
+
     if (Object.keys(errors).length > 0) {
       toast.error('Please correct the errors in the form');
       return;
@@ -124,9 +130,8 @@ export default function RegisterPage() {
               profilePicture: '',
               course: '',
               skills: '',
-              bio: ''
-            }
-          ),
+              bio: '',
+            }),
         }),
       });
 

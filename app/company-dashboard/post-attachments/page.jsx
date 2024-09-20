@@ -10,7 +10,8 @@ import 'react-toastify/dist/ReactToastify.css';
 
 export default function PostAttachment() {
   const router = useRouter();
-  const { data: session } = useSession();
+  const { data: session, status } = useSession();
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [attachment, setAttachment] = useState({
     title: '',
     location: '',
@@ -20,9 +21,30 @@ export default function PostAttachment() {
     startDate: '',
     stipend: ''
   });
+  const [errors, setErrors] = useState({});
+
+  if (status === 'loading') return <p>Loading...</p>;
+  if (status === 'unauthenticated') {
+    router.push('/login'); // Redirect to login page if not authenticated
+    return null;
+  }
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    // Basic validation
+    const newErrors = {};
+    if (!attachment.title) newErrors.title = 'Title is required';
+    if (!attachment.location) newErrors.location = 'Location is required';
+    if (!attachment.duration) newErrors.duration = 'Duration is required';
+
+    if (Object.keys(newErrors).length > 0) {
+      setErrors(newErrors);
+      toast.error('Please correct the errors before submitting');
+      return;
+    }
+
+    setIsSubmitting(true);
     try {
       const response = await fetch('/api/attachments', {
         method: 'POST',
@@ -40,7 +62,9 @@ export default function PostAttachment() {
         toast.error('Failed to post attachment');
       }
     } catch (error) {
-      toast.error('Failed to post attachment');
+      toast.error('An error occurred. Please try again.');
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -54,48 +78,61 @@ export default function PostAttachment() {
             <Input
               label="Title"
               value={attachment.title}
-              onChange={(e) => setAttachment({...attachment, title: e.target.value})}
+              onChange={(e) => setAttachment({ ...attachment, title: e.target.value })}
               className="mb-4"
+              isInvalid={errors.title}
+              errorMessage={errors.title}
             />
             <Input
               label="Location"
               value={attachment.location}
-              onChange={(e) => setAttachment({...attachment, location: e.target.value})}
+              onChange={(e) => setAttachment({ ...attachment, location: e.target.value })}
               className="mb-4"
+              isInvalid={errors.location}
+              errorMessage={errors.location}
             />
             <Textarea
               label="Description"
               value={attachment.description}
-              onChange={(e) => setAttachment({...attachment, description: e.target.value})}
+              onChange={(e) => setAttachment({ ...attachment, description: e.target.value })}
               className="mb-4"
             />
             <Textarea
               label="Requirements"
               value={attachment.requirements}
-              onChange={(e) => setAttachment({...attachment, requirements: e.target.value})}
+              onChange={(e) => setAttachment({ ...attachment, requirements: e.target.value })}
               className="mb-4"
             />
             <Input
               label="Duration (in weeks)"
               type="number"
               value={attachment.duration}
-              onChange={(e) => setAttachment({...attachment, duration: e.target.value})}
+              onChange={(e) => setAttachment({ ...attachment, duration: e.target.value })}
               className="mb-4"
+              isInvalid={errors.duration}
+              errorMessage={errors.duration}
             />
             <Input
               label="Start Date"
               type="date"
               value={attachment.startDate}
-              onChange={(e) => setAttachment({...attachment, startDate: e.target.value})}
+              onChange={(e) => setAttachment({ ...attachment, startDate: e.target.value })}
               className="mb-4"
             />
             <Input
               label="Stipend (optional)"
+              type="number"
               value={attachment.stipend}
-              onChange={(e) => setAttachment({...attachment, stipend: e.target.value})}
+              onChange={(e) => setAttachment({ ...attachment, stipend: e.target.value })}
               className="mb-4"
             />
-            <Button color="primary" type="submit">Post Attachment</Button>
+            <Button
+              color="primary"
+              type="submit"
+              disabled={isSubmitting}
+            >
+              {isSubmitting ? 'Posting...' : 'Post Attachment'}
+            </Button>
           </form>
         </CardBody>
       </Card>

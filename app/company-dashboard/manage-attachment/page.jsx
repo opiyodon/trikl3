@@ -1,4 +1,4 @@
-'use client'
+'use client';
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
@@ -16,14 +16,26 @@ export default function ManageAttachment() {
 
   useEffect(() => {
     const fetchAttachment = async () => {
+      // Ensure id and session are defined before fetching
       if (id && session?.user?.email) {
-        const response = await fetch(`/api/attachments/${id}?companyEmail=${session.user.email}`);
-        const data = await response.json();
-        setAttachment(data);
+        try {
+          const response = await fetch(`/api/attachments/${id}?companyEmail=${session.user.email}`);
+          if (response.ok) {
+            const data = await response.json();
+            setAttachment(data);
+          } else {
+            toast.error('Failed to fetch attachment data.');
+          }
+        } catch (error) {
+          toast.error('Error fetching attachment data.');
+        }
       }
     };
 
-    fetchAttachment();
+    // Only fetch when both id and session are available
+    if (id && session) {
+      fetchAttachment();
+    }
   }, [id, session]);
 
   const handleUpdate = async (e) => {
@@ -41,7 +53,7 @@ export default function ManageAttachment() {
         toast.error('Failed to update attachment');
       }
     } catch (error) {
-      toast.error('Failed to update attachment');
+      toast.error('Error updating attachment');
     }
   };
 
@@ -59,7 +71,7 @@ export default function ManageAttachment() {
           toast.error('Failed to delete attachment');
         }
       } catch (error) {
-        toast.error('Failed to delete attachment');
+        toast.error('Error deleting attachment');
       }
     }
   };
@@ -76,19 +88,19 @@ export default function ManageAttachment() {
             <Input
               label="Title"
               value={attachment.title}
-              onChange={(e) => setAttachment({...attachment, title: e.target.value})}
+              onChange={(e) => setAttachment({ ...attachment, title: e.target.value })}
               className="mb-4"
             />
             <Input
               label="Location"
               value={attachment.location}
-              onChange={(e) => setAttachment({...attachment, location: e.target.value})}
+              onChange={(e) => setAttachment({ ...attachment, location: e.target.value })}
               className="mb-4"
             />
             <Textarea
               label="Description"
               value={attachment.description}
-              onChange={(e) => setAttachment({...attachment, description: e.target.value})}
+              onChange={(e) => setAttachment({ ...attachment, description: e.target.value })}
               className="mb-4"
             />
             <div className="flex justify-between">
