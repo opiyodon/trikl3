@@ -19,20 +19,11 @@ const Nav = () => {
   }, [pathName]);
 
   useEffect(() => {
-    const publicRoutes = ['/', '/about', '/services', '/contact', '/login', '/register', '/not-found'];
-    const studentRoutes = ['/student-dashboard', '/student-dashboard/attachments', '/student-dashboard/resources'];
-    const companyRoutes = ['/company-dashboard', '/company-dashboard/attachments', '/company-dashboard/post-resources'];
-
-    if (status === "unauthenticated" && !publicRoutes.includes(pathName) && !pathName.startsWith('/')) {
-      router.push('/login');
-    } else if (status === "authenticated") {
-      if (session.user.type === "student" && !studentRoutes.some(route => pathName.startsWith(route)) && !publicRoutes.includes(pathName)) {
-        router.push('/student-dashboard');
-      } else if (session.user.type === "company" && !companyRoutes.some(route => pathName.startsWith(route)) && !publicRoutes.includes(pathName)) {
-        router.push('/company-dashboard');
-      }
+    const publicRoutes = ['/', '/about', '/services', '/contact', '/login', '/register', 'not-found'];
+    if (status === "unauthenticated" && !publicRoutes.includes(pathName)) {
+      router.push('/');
     }
-  }, [status, router, pathName, session]);
+  }, [status, router, pathName]);
 
   const LoggedOutNavItems = () => (
     <>
@@ -61,18 +52,14 @@ const Nav = () => {
 
   const renderNavItems = () => {
     if (status === "authenticated") {
-      if (session.user.type === "student") {
-        return <StudentNavItems />;
-      } else if (session.user.type === "company") {
-        return <CompanyNavItems />;
-      }
+      return session.user.userType === "student" ? <StudentNavItems /> : <CompanyNavItems />;
     }
     return <LoggedOutNavItems />;
   };
 
   const getDashboardLink = () => {
     if (status === "authenticated") {
-      return session.user.type === "student" ? "/student-dashboard" : "/company-dashboard";
+      return session.user.userType === "student" ? "/student-dashboard" : "/company-dashboard";
     }
     return "/";
   };
@@ -95,8 +82,8 @@ const Nav = () => {
           {status === "authenticated" ? (
             <div className="flex items-center gap-4">
               <NavItem
-                route={`${session.user.type === "student" ? "/student-dashboard" : "/company-dashboard"}/applications`}
-                name="View Applications"
+                route={`${session.user.userType === "student" ? "/student-dashboard" : "/company-dashboard"}/applications`}
+                name={"View Applications"}
                 isButton={true}
               />
               <UserProfile />
@@ -115,6 +102,6 @@ const Nav = () => {
       </div>
     </Navbar>
   );
-};
+}
 
 export default Nav;
