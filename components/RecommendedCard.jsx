@@ -7,6 +7,7 @@ const UNSPLASH_ACCESS_KEY = process.env.NEXT_PUBLIC_UNSPLASH_ACCESS_KEY;
 
 const RecommendedCard = ({ company, title, location, description, url, isLocal }) => {
   const [imageUrl, setImageUrl] = useState('/default.png');
+  const [loadingImage, setLoadingImage] = useState(true); // For image loading state
   const router = useRouter();
 
   useEffect(() => {
@@ -19,6 +20,8 @@ const RecommendedCard = ({ company, title, location, description, url, isLocal }
       } catch (error) {
         console.error('Error fetching image:', error);
         setImageUrl('/default.png');
+      } finally {
+        setLoadingImage(false); // Stop loading spinner once image is loaded or failed
       }
     };
 
@@ -35,7 +38,11 @@ const RecommendedCard = ({ company, title, location, description, url, isLocal }
     <Card className="h-full flex flex-col">
       <CardBody className="p-0 flex-grow">
         <div className="relative w-full h-48">
-          {imageUrl && (
+          {loadingImage ? (
+            <div className="w-full h-full flex items-center justify-center">
+              <div className="loader"></div> {/* Add a spinner or loading animation */}
+            </div>
+          ) : (
             <Image
               src={imageUrl}
               alt={`Job image for ${title} at ${company}`}

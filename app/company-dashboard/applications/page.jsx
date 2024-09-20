@@ -7,7 +7,7 @@ import { useSession } from 'next-auth/react';
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import FuturisticLoader from '@/components/FuturisticLoader';
-import ApplicationCard from '@/components/ApplicationCard';
+import ApplicationCard from '@/components/company/ApplicationCard';
 
 export default function ApplicationsPage() {
   const { data: session } = useSession();
