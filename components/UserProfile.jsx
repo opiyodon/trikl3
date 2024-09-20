@@ -9,9 +9,10 @@ const UserProfile = () => {
 
   useEffect(() => {
     const fetchUserData = async () => {
-      if (session?.user?.email) {
+      if (session?.user?.email && session?.user?.userType) {
         try {
-          const response = await fetch(`/api/students?email=${session.user.email}`);
+          const endpoint = session.user.userType === 'student' ? 'students' : 'companies';
+          const response = await fetch(`/api/${endpoint}?email=${session.user.email}`);
           if (!response.ok) {
             throw new Error(`HTTP error! status: ${response.status}`);
           }
@@ -36,6 +37,17 @@ const UserProfile = () => {
     }
   };
 
+  const getUserName = () => {
+    if (userData) {
+      return session.user.userType === 'student' ? userData.fullName : userData.companyName;
+    }
+    return "User";
+  };
+
+  const getProfilePicture = () => {
+    return userData?.profilePicture || "/assets/avatar.png";
+  };
+
   return (
     <Dropdown placement="bottom-end">
       <DropdownTrigger>
@@ -44,9 +56,9 @@ const UserProfile = () => {
           color="secondary"
           as="button"
           className="transition-transform"
-          name={userData?.fullName || "User"}
+          name={getUserName()}
           size="sm"
-          src={userData?.profilePicture || "/assets/avatar.png"}
+          src={getProfilePicture()}
         />
       </DropdownTrigger>
       <DropdownMenu aria-label="Profile Actions" variant="flat">
@@ -54,7 +66,7 @@ const UserProfile = () => {
           <p className="font-semibold">Signed in as</p>
           <p className="font-semibold">{userData?.email || session?.user?.email}</p>
         </DropdownItem>
-        <DropdownItem key="settings" href="/student-dashboard/account">My Account</DropdownItem>
+        <DropdownItem key="settings" href={`/${session.user.userType}-dashboard/account`}>My Account</DropdownItem>
         <DropdownItem key="logout" color="danger" onPress={handleLogout}>
           Log Out
         </DropdownItem>
