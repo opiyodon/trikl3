@@ -13,29 +13,30 @@ export default function PostAttachmentForm() {
     const { data: session, status } = useSession();
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [attachment, setAttachment] = useState({
-        title: '',
+        companyName: '',
+        position: '',
         location: '',
         description: '',
         requirements: '',
-        duration: '',
-        startDate: '',
-        stipend: ''
+        duration: ''
     });
     const [errors, setErrors] = useState({});
 
     if (status === 'loading') return <p>Loading...</p>;
     if (status === 'unauthenticated') {
-        router.push('/login'); // Redirect to login page if not authenticated
+        router.push('/login');
         return null;
     }
 
     const handleSubmit = async (e) => {
         e.preventDefault();
 
-        // Basic validation
         const newErrors = {};
-        if (!attachment.title) newErrors.title = 'Title is required';
+        if (!attachment.companyName) newErrors.companyName = 'Company name is required';
+        if (!attachment.position) newErrors.position = 'Position is required';
         if (!attachment.location) newErrors.location = 'Location is required';
+        if (!attachment.description) newErrors.description = 'Description is required';
+        if (!attachment.requirements) newErrors.requirements = 'Requirements are required';
         if (!attachment.duration) newErrors.duration = 'Duration is required';
 
         if (Object.keys(newErrors).length > 0) {
@@ -59,9 +60,11 @@ export default function PostAttachmentForm() {
                 toast.success('Attachment posted successfully');
                 router.push('/company-dashboard/attachments');
             } else {
-                toast.error('Failed to post attachment');
+                const errorData = await response.json();
+                toast.error(errorData.message || 'Failed to post attachment');
             }
         } catch (error) {
+            console.error('Error posting attachment:', error);
             toast.error('An error occurred. Please try again.');
         } finally {
             setIsSubmitting(false);
@@ -76,12 +79,20 @@ export default function PostAttachmentForm() {
                 <CardBody>
                     <form onSubmit={handleSubmit}>
                         <Input
-                            label="Title"
-                            value={attachment.title}
-                            onChange={(e) => setAttachment({ ...attachment, title: e.target.value })}
+                            label="Company Name"
+                            value={attachment.companyName}
+                            onChange={(e) => setAttachment({ ...attachment, companyName: e.target.value })}
                             className="mb-4"
-                            isInvalid={errors.title}
-                            errorMessage={errors.title}
+                            isInvalid={errors.companyName}
+                            errorMessage={errors.companyName}
+                        />
+                        <Input
+                            label="Position"
+                            value={attachment.position}
+                            onChange={(e) => setAttachment({ ...attachment, position: e.target.value })}
+                            className="mb-4"
+                            isInvalid={errors.position}
+                            errorMessage={errors.position}
                         />
                         <Input
                             label="Location"
@@ -96,12 +107,16 @@ export default function PostAttachmentForm() {
                             value={attachment.description}
                             onChange={(e) => setAttachment({ ...attachment, description: e.target.value })}
                             className="mb-4"
+                            isInvalid={errors.description}
+                            errorMessage={errors.description}
                         />
                         <Textarea
                             label="Requirements"
                             value={attachment.requirements}
                             onChange={(e) => setAttachment({ ...attachment, requirements: e.target.value })}
                             className="mb-4"
+                            isInvalid={errors.requirements}
+                            errorMessage={errors.requirements}
                         />
                         <Input
                             label="Duration (in weeks)"
@@ -112,26 +127,14 @@ export default function PostAttachmentForm() {
                             isInvalid={errors.duration}
                             errorMessage={errors.duration}
                         />
-                        <Input
-                            label="Start Date"
-                            type="date"
-                            value={attachment.startDate}
-                            onChange={(e) => setAttachment({ ...attachment, startDate: e.target.value })}
-                            className="mb-4"
-                        />
-                        <Input
-                            label="Stipend (optional)"
-                            type="number"
-                            value={attachment.stipend}
-                            onChange={(e) => setAttachment({ ...attachment, stipend: e.target.value })}
-                            className="mb-4"
-                        />
                         <Button
-                            color="primary"
+                             className="btnPri"
                             type="submit"
                             disabled={isSubmitting}
                         >
-                            {isSubmitting ? 'Posting...' : 'Post Attachment'}
+                            {isSubmitting ? (
+                                <div className="animate-spin rounded-full h-6 w-6 border-t-2 border-b-2 border-white"></div>
+                            ) : 'Post Attachment'}
                         </Button>
                     </form>
                 </CardBody>

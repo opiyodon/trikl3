@@ -7,6 +7,7 @@ const AttachmentSchema = new mongoose.Schema({
   description: { type: String, required: true },
   requirements: { type: String, required: true },
   duration: { type: String, required: true },
+  companyEmail: { type: String, required: true }
 }, { timestamps: true });
 
 export default mongoose.models.Attachment || mongoose.model('Attachment', AttachmentSchema);

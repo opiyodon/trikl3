@@ -46,7 +46,7 @@ const Nav = () => {
     <>
       <NavItem route="/company-dashboard" name="Dashboard" activeItem={activeItem} />
       <NavItem route="/company-dashboard/attachments" name="Attachments" activeItem={activeItem} />
-      <NavItem route="/company-dashboard/post-resources" name="Resources" activeItem={activeItem} />
+      <NavItem route="/company-dashboard/resources" name="Resources" activeItem={activeItem} />
     </>
   );
 

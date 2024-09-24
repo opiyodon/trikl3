@@ -9,41 +9,41 @@ import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import FuturisticLoader from '@/components/FuturisticLoader';
 
-const AttachmentCard = ({ attachment }) => (
+const ResourcesCard = ({ resource }) => (
   <Card className="mb-4 hover:shadow-lg transition-shadow duration-200">
     <CardBody>
-      <h3 className="text-xl font-semibold mb-2">{attachment.position}</h3>
-      <p className="text-sm text-gray-500 mb-2">{attachment.companyName} - {attachment.location}</p>
+      <h3 className="text-xl font-semibold mb-2">{resource.position}</h3>
+      <p className="text-sm text-gray-500 mb-2">{resource.companyName} - {resource.location}</p>
       <Divider className="my-3" />
-      <p className="text-sm line-clamp-3">{attachment.description}</p>
+      <p className="text-sm line-clamp-3">{resource.description}</p>
     </CardBody>
     <CardFooter className="flex justify-between">
-      <p className="text-sm">Duration: {attachment.duration} weeks</p>
-      <Link href={`/company-dashboard/attachments/${attachment._id}`}>
+      <p className="text-sm">Duration: {resource.duration} weeks</p>
+      <Link href={`/company-dashboard/resources/${resource._id}`}>
         <Button color="primary" size="sm">Manage</Button>
       </Link>
     </CardFooter>
   </Card>
 );
 
-export default function CompanyAttachments() {
+export default function CompanyResources() {
   const { data: session, status } = useSession();
-  const [attachments, setAttachments] = useState([]);
+  const [resources, setResources] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    const fetchAttachments = async () => {
+    const fetchResources = async () => {
       if (session?.user?.email) {
         try {
-          const response = await fetch(`/api/attachments?companyEmail=${encodeURIComponent(session.user.email)}`);
+          const response = await fetch(`/api/resources?companyEmail=${encodeURIComponent(session.user.email)}`);
           if (!response.ok) {
-            throw new Error('Failed to fetch attachments');
+            throw new Error('Failed to fetch resources');
           }
           const data = await response.json();
-          setAttachments(data);
+          setResources(data);
         } catch (error) {
-          console.error('Error fetching attachments:', error);
-          toast.error('Failed to load attachments. Please try again.');
+          console.error('Error fetching resources:', error);
+          toast.error('Failed to load resources. Please try again.');
         } finally {
           setIsLoading(false);
         }
@@ -51,7 +51,7 @@ export default function CompanyAttachments() {
     };
 
     if (status !== 'loading') {
-      fetchAttachments();
+      fetchResources();
     }
   }, [session, status]);
 
@@ -63,17 +63,17 @@ export default function CompanyAttachments() {
     <Container>
       <ToastContainer position="top-right" autoClose={5000} />
       <div className="flex justify-between items-center mb-8">
-        <h1 className="text-3xl font-bold">Your Attachments</h1>
-        <Link href="/company-dashboard/post-attachments">
-          <Button color="success" size="lg">Post New Attachment</Button>
+        <h1 className="text-3xl font-bold">Your Resources</h1>
+        <Link href="/company-dashboard/post-resources">
+          <Button color="success" size="lg">Post New Resource</Button>
         </Link>
       </div>
-      {attachments.length === 0 ? (
-        <p className="text-center text-gray-500 mt-8">You haven't posted any attachments yet.</p>
+      {resources.length === 0 ? (
+        <p className="text-center text-gray-500 mt-8">You haven't posted any resources yet.</p>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {attachments.map(attachment => (
-            <AttachmentCard key={attachment._id} attachment={attachment} />
+          {resources.map(resource => (
+            <ResourcesCard key={resource._id} resource={resource} />
           ))}
         </div>
       )}

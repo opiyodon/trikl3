@@ -32,7 +32,7 @@ export default function PostResourceForm() {
 
     if (status === 'loading') return <p>Loading...</p>;
     if (status === 'unauthenticated') {
-        router.push('/login'); // Redirect to login page if not authenticated
+        router.push('/login');
         return null;
     }
 
@@ -63,8 +63,7 @@ export default function PostResourceForm() {
                 body: JSON.stringify({
                     ...resource,
                     companyEmail: session?.user?.email,
-                    companyName: session?.user?.name,
-                    createdAt: new Date().toISOString()
+                    companyName: session?.user?.name
                 })
             });
 
@@ -72,7 +71,8 @@ export default function PostResourceForm() {
                 toast.success('Resource posted successfully');
                 router.push('/company-dashboard');
             } else {
-                toast.error('Failed to post resource');
+                const errorData = await response.json();
+                toast.error(errorData.message || 'Failed to post resource');
             }
         } catch (error) {
             toast.error('Failed to post resource');
@@ -133,7 +133,9 @@ export default function PostResourceForm() {
                             placeholder="e.g., programming, career advice, industry insights"
                         />
                         <Button color="primary" type="submit" disabled={isSubmitting}>
-                            {isSubmitting ? 'Posting...' : 'Post Resource'}
+                            {isSubmitting ? (
+                                <div className="animate-spin rounded-full h-6 w-6 border-t-2 border-b-2 border-white"></div>
+                            ) : 'Post Resource'}
                         </Button>
                     </form>
                 </CardBody>
