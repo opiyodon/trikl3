@@ -1,41 +1,32 @@
-import { Card, CardBody, CardFooter, Button, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, useDisclosure } from "@nextui-org/react";
+import React from 'react';
+import { Card, CardHeader, CardBody, CardFooter, Button } from "@nextui-org/react";
 
-const ApplicationCard = ({ application, updateStatus }) => {
-    const { isOpen, onOpen, onClose } = useDisclosure();
-
-    return (
-        <Card className="mb-4 flex flex-col">
-            <CardBody className="flex-grow overflow-hidden">
-                <h3 className="text-lg font-semibold mb-2">{application.studentName}</h3>
-                <p className="text-sm text-gray-500 mb-2">{application.email}</p>
-                <p className="text-sm line-clamp-2">{application.jobDetails.title}</p>
-                <p className="text-sm font-semibold">Status: {application.status}</p>
-            </CardBody>
-            <CardFooter>
-                <Button onClick={onOpen} className="mr-2">View Details</Button>
-                <Button onClick={() => updateStatus(application._id, 'Accepted')} className="mr-2">Accept</Button>
-                <Button onClick={() => updateStatus(application._id, 'Rejected')} color="error">Reject</Button>
-            </CardFooter>
-
-            <Modal isOpen={isOpen} onClose={onClose}>
-                <ModalContent>
-                    <ModalHeader>{application.jobDetails.title}</ModalHeader>
-                    <ModalBody>
-                        <p><strong>Applicant:</strong> {application.studentName}</p>
-                        <p><strong>Email:</strong> {application.email}</p>
-                        <p><strong>Company:</strong> {application.jobDetails.company}</p>
-                        <p><strong>Location:</strong> {application.jobDetails.location}</p>
-                        <p><strong>Message:</strong> {application.message}</p>
-                    </ModalBody>
-                    <ModalFooter>
-                        <Button color="danger" variant="light" onPress={onClose}>
-                            Close
-                        </Button>
-                    </ModalFooter>
-                </ModalContent>
-            </Modal>
-        </Card>
-    );
+const ApplicationCard = ({ application, onDelete, onViewDetails, isCompanyView }) => {
+  return (
+    <Card className="w-full">
+      <CardHeader className="flex-col items-start">
+        <h4 className="text-lg font-bold">{application.jobDetails.title}</h4>
+        <p className="text-small text-default-500">
+          {isCompanyView ? application.studentName : application.jobDetails.company}
+        </p>
+      </CardHeader>
+      <CardBody>
+        <p><strong>Location:</strong> {application.jobDetails.location}</p>
+        <p><strong>Status:</strong> {application.status}</p>
+        <p><strong>Applied on:</strong> {new Date(application.createdAt).toLocaleDateString()}</p>
+      </CardBody>
+      <CardFooter className="flex justify-between">
+        <Button color="primary" onPress={() => onViewDetails(application)}>
+          View Details
+        </Button>
+        {!isCompanyView && (
+          <Button color="danger" onPress={() => onDelete(application._id)}>
+            Delete
+          </Button>
+        )}
+      </CardFooter>
+    </Card>
+  );
 };
 
 export default ApplicationCard;

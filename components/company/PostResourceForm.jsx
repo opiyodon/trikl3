@@ -2,81 +2,71 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { Card, CardBody, Button, Input, Textarea, Select, SelectItem } from "@nextui-org/react";
+import { Card, CardBody, Button, Input, Textarea } from "@nextui-org/react";
 import Container from '@/components/pageLayout/Container';
 import { useSession } from 'next-auth/react';
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import FuturisticLoader from '../FuturisticLoader';
 
 export default function PostResourceForm() {
     const router = useRouter();
     const { data: session, status } = useSession();
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [resource, setResource] = useState({
-        title: '',
+        companyName: '',
+        position: '',
+        location: '',
         description: '',
-        type: '',
-        link: '',
-        tags: ''
+        requirements: '',
+        duration: ''
     });
     const [errors, setErrors] = useState({});
 
-    const resourceTypes = [
-        { value: 'article', label: 'Article' },
-        { value: 'video', label: 'Video' },
-        { value: 'pdf', label: 'PDF Document' },
-        { value: 'webinar', label: 'Webinar' },
-        { value: 'course', label: 'Online Course' },
-        { value: 'tool', label: 'Software Tool' },
-    ];
-
-    if (status === 'loading') return <p>Loading...</p>;
+    if (status === 'loading') return <FuturisticLoader />;
     if (status === 'unauthenticated') {
         router.push('/login');
         return null;
     }
 
-    const validateForm = () => {
-        const newErrors = {};
-        if (!resource.title) newErrors.title = 'Title is required';
-        if (!resource.type) newErrors.type = 'Resource type is required';
-        if (!resource.link) newErrors.link = 'Link is required';
-        return newErrors;
-    };
-
     const handleSubmit = async (e) => {
         e.preventDefault();
 
-        const formErrors = validateForm();
-        if (Object.keys(formErrors).length > 0) {
-            setErrors(formErrors);
+        const newErrors = {};
+        if (!resource.companyName) newErrors.companyName = 'Company name is required';
+        if (!resource.position) newErrors.position = 'Position is required';
+        if (!resource.location) newErrors.location = 'Location is required';
+        if (!resource.description) newErrors.description = 'Description is required';
+        if (!resource.requirements) newErrors.requirements = 'Requirements are required';
+        if (!resource.duration) newErrors.duration = 'Duration is required';
+
+        if (Object.keys(newErrors).length > 0) {
+            setErrors(newErrors);
             toast.error('Please correct the errors before submitting');
             return;
         }
 
         setIsSubmitting(true);
-
         try {
             const response = await fetch('/api/resources', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
                     ...resource,
-                    companyEmail: session?.user?.email,
-                    companyName: session?.user?.name
+                    companyEmail: session?.user?.email
                 })
             });
 
             if (response.ok) {
                 toast.success('Resource posted successfully');
-                router.push('/company-dashboard');
+                router.push('/company-dashboard/resources');
             } else {
                 const errorData = await response.json();
                 toast.error(errorData.message || 'Failed to post resource');
             }
         } catch (error) {
-            toast.error('Failed to post resource');
             console.error('Error posting resource:', error);
+            toast.error('An error occurred. Please try again.');
         } finally {
             setIsSubmitting(false);
         }
@@ -90,49 +80,59 @@ export default function PostResourceForm() {
                 <CardBody>
                     <form onSubmit={handleSubmit}>
                         <Input
-                            label="Title"
-                            value={resource.title}
-                            onChange={(e) => setResource({ ...resource, title: e.target.value })}
+                            label="Company Name"
+                            value={resource.companyName}
+                            onChange={(e) => setResource({ ...resource, companyName: e.target.value })}
                             className="mb-4"
-                            isInvalid={errors.title}
-                            errorMessage={errors.title}
+                            isInvalid={errors.companyName}
+                            errorMessage={errors.companyName}
+                        />
+                        <Input
+                            label="Position"
+                            value={resource.position}
+                            onChange={(e) => setResource({ ...resource, position: e.target.value })}
+                            className="mb-4"
+                            isInvalid={errors.position}
+                            errorMessage={errors.position}
+                        />
+                        <Input
+                            label="Location"
+                            value={resource.location}
+                            onChange={(e) => setResource({ ...resource, location: e.target.value })}
+                            className="mb-4"
+                            isInvalid={errors.location}
+                            errorMessage={errors.location}
                         />
                         <Textarea
                             label="Description"
                             value={resource.description}
                             onChange={(e) => setResource({ ...resource, description: e.target.value })}
                             className="mb-4"
+                            isInvalid={errors.description}
+                            errorMessage={errors.description}
                         />
-                        <Select
-                            label="Resource Type"
-                            value={resource.type}
-                            onChange={(e) => setResource({ ...resource, type: e.target.value })}
+                        <Textarea
+                            label="Requirements"
+                            value={resource.requirements}
+                            onChange={(e) => setResource({ ...resource, requirements: e.target.value })}
                             className="mb-4"
-                            isInvalid={errors.type}
-                            errorMessage={errors.type}
+                            isInvalid={errors.requirements}
+                            errorMessage={errors.requirements}
+                        />
+                        <Input
+                            label="Duration (in weeks)"
+                            type="number"
+                            value={resource.duration}
+                            onChange={(e) => setResource({ ...resource, duration: e.target.value })}
+                            className="mb-4"
+                            isInvalid={errors.duration}
+                            errorMessage={errors.duration}
+                        />
+                        <Button
+                            className="btnPri"
+                            type="submit"
+                            disabled={isSubmitting}
                         >
-                            {resourceTypes.map((type) => (
-                                <SelectItem key={type.value} value={type.value}>
-                                    {type.label}
-                                </SelectItem>
-                            ))}
-                        </Select>
-                        <Input
-                            label="Link to Resource"
-                            value={resource.link}
-                            onChange={(e) => setResource({ ...resource, link: e.target.value })}
-                            className="mb-4"
-                            isInvalid={errors.link}
-                            errorMessage={errors.link}
-                        />
-                        <Input
-                            label="Tags (comma-separated)"
-                            value={resource.tags}
-                            onChange={(e) => setResource({ ...resource, tags: e.target.value })}
-                            className="mb-4"
-                            placeholder="e.g., programming, career advice, industry insights"
-                        />
-                        <Button color="primary" type="submit" disabled={isSubmitting}>
                             {isSubmitting ? (
                                 <div className="animate-spin rounded-full h-6 w-6 border-t-2 border-b-2 border-white"></div>
                             ) : 'Post Resource'}

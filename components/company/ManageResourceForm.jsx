@@ -10,56 +10,56 @@ import 'react-toastify/dist/ReactToastify.css';
 import FuturisticLoader from '../FuturisticLoader';
 import ConfirmationDialog from './ConfirmationDialog';
 
-export default function ManageAttachmentForm() {
+export default function ManageResourceForm() {
   const router = useRouter();
   const { data: session, status } = useSession();
-  const [attachment, setAttachment] = useState(null);
+  const [resource, setResource] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
 
   useEffect(() => {
-    const fetchAttachment = async () => {
+    const fetchResource = async () => {
       const id = new URLSearchParams(window.location.search).get('id');
       if (id && session?.user?.email) {
         try {
-          const response = await fetch(`/api/attachments/${id}?companyEmail=${session.user.email}`);
+          const response = await fetch(`/api/resources/${id}?companyEmail=${session.user.email}`);
           if (response.ok) {
             const data = await response.json();
-            setAttachment(data);
+            setResource(data);
             setIsLoading(false);
           } else {
-            toast.error('Failed to fetch attachment data.');
+            toast.error('Failed to fetch resource data.');
             setIsLoading(false);
           }
         } catch (error) {
-          toast.error('Error fetching attachment data.');
+          toast.error('Error fetching resource data.');
           setIsLoading(false);
         }
       }
     };
 
     if (status === 'authenticated') {
-      fetchAttachment();
+      fetchResource();
     }
   }, [session, status]);
 
   const handleUpdate = async (e) => {
     e.preventDefault();
     try {
-      const response = await fetch(`/api/attachments/${attachment._id}`, {
+      const response = await fetch(`/api/resources/${resource._id}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(attachment)
+        body: JSON.stringify(resource)
       });
 
       if (response.ok) {
-        toast.success('Attachment updated successfully');
-        router.push('/company-dashboard/attachments');
+        toast.success('Resource updated successfully');
+        router.push('/company-dashboard/resources');
       } else {
-        toast.error('Failed to update attachment');
+        toast.error('Failed to update resource');
       }
     } catch (error) {
-      toast.error('Error updating attachment');
+      toast.error('Error updating resource');
     }
   };
 
@@ -69,73 +69,73 @@ export default function ManageAttachmentForm() {
 
   const handleDeleteConfirm = async () => {
     try {
-      const response = await fetch(`/api/attachments/${attachment._id}`, {
+      const response = await fetch(`/api/resources/${resource._id}`, {
         method: 'DELETE'
       });
 
       if (response.ok) {
-        toast.success('Attachment deleted successfully');
-        router.push('/company-dashboard/attachments');
+        toast.success('Resource deleted successfully');
+        router.push('/company-dashboard/resources');
       } else {
-        toast.error('Failed to delete attachment');
+        toast.error('Failed to delete resource');
       }
     } catch (error) {
-      toast.error('Error deleting attachment');
+      toast.error('Error deleting resource');
     }
     setIsDeleteDialogOpen(false);
   };
 
   if (status === 'loading' || isLoading) return <FuturisticLoader />;
 
-  if (!attachment) return <div>No attachment found</div>;
+  if (!resource) return <div>No resource found</div>;
 
   return (
     <Container>
       <ToastContainer position="top-right" autoClose={5000} />
-      <h1 className="text-3xl font-bold mb-8">Manage Attachment</h1>
+      <h1 className="text-3xl font-bold mb-8">Manage Resource</h1>
       <Card>
         <CardBody>
           <form onSubmit={handleUpdate}>
             <Input
               label="Company Name"
-              value={attachment.companyName}
-              onChange={(e) => setAttachment({ ...attachment, companyName: e.target.value })}
+              value={resource.companyName}
+              onChange={(e) => setResource({ ...resource, companyName: e.target.value })}
               className="mb-4"
             />
             <Input
               label="Position"
-              value={attachment.position}
-              onChange={(e) => setAttachment({ ...attachment, position: e.target.value })}
+              value={resource.position}
+              onChange={(e) => setResource({ ...resource, position: e.target.value })}
               className="mb-4"
             />
             <Input
               label="Location"
-              value={attachment.location}
-              onChange={(e) => setAttachment({ ...attachment, location: e.target.value })}
+              value={resource.location}
+              onChange={(e) => setResource({ ...resource, location: e.target.value })}
               className="mb-4"
             />
             <Textarea
               label="Description"
-              value={attachment.description}
-              onChange={(e) => setAttachment({ ...attachment, description: e.target.value })}
+              value={resource.description}
+              onChange={(e) => setResource({ ...resource, description: e.target.value })}
               className="mb-4"
             />
             <Textarea
               label="Requirements"
-              value={attachment.requirements}
-              onChange={(e) => setAttachment({ ...attachment, requirements: e.target.value })}
+              value={resource.requirements}
+              onChange={(e) => setResource({ ...resource, requirements: e.target.value })}
               className="mb-4"
             />
             <Input
               label="Duration (in weeks)"
               type="number"
-              value={attachment.duration}
-              onChange={(e) => setAttachment({ ...attachment, duration: e.target.value })}
+              value={resource.duration}
+              onChange={(e) => setResource({ ...resource, duration: e.target.value })}
               className="mb-4"
             />
             <div className="flex justify-between">
-              <Button color="primary" type="submit">Update Attachment</Button>
-              <Button color="danger" onClick={handleDeleteClick}>Delete Attachment</Button>
+              <Button color="primary" type="submit">Update Resource</Button>
+              <Button color="danger" onClick={handleDeleteClick}>Delete Resource</Button>
             </div>
           </form>
         </CardBody>
@@ -145,7 +145,7 @@ export default function ManageAttachmentForm() {
         onClose={() => setIsDeleteDialogOpen(false)}
         onConfirm={handleDeleteConfirm}
         title="Confirm Deletion"
-        message="Are you sure you want to delete this attachment?"
+        message="Are you sure you want to delete this resource?"
       />
     </Container>
   );

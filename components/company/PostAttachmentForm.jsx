@@ -7,6 +7,7 @@ import Container from '@/components/pageLayout/Container';
 import { useSession } from 'next-auth/react';
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import FuturisticLoader from '../FuturisticLoader';
 
 export default function PostAttachmentForm() {
     const router = useRouter();
@@ -22,7 +23,7 @@ export default function PostAttachmentForm() {
     });
     const [errors, setErrors] = useState({});
 
-    if (status === 'loading') return <p>Loading...</p>;
+    if (status === 'loading') return <FuturisticLoader />;
     if (status === 'unauthenticated') {
         router.push('/login');
         return null;
@@ -128,7 +129,7 @@ export default function PostAttachmentForm() {
                             errorMessage={errors.duration}
                         />
                         <Button
-                             className="btnPri"
+                            className="btnPri"
                             type="submit"
                             disabled={isSubmitting}
                         >

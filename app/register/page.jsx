@@ -119,10 +119,13 @@ export default function RegisterPage() {
           userType: isCompany ? 'company' : 'student',
           email: formData.email,
           password: formData.password,
-          fullName: isCompany ? formData.companyName : formData.fullName,
           ...(isCompany
-            ? { industry: formData.industry }
+            ? {
+              companyName: formData.companyName,
+              industry: formData.industry
+            }
             : {
+              fullName: formData.fullName,
               institution: formData.institution,
               fieldOfStudy: formData.fieldOfStudy,
               yearOfStudy: '',

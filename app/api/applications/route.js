@@ -68,6 +68,38 @@ export async function POST(req) {
   }
 }
 
+// Handle PUT request to update application status
+export async function PUT(req) {
+  await connectToDatabase();
+  const { id, status } = await req.json();
+
+  try {
+    const updatedApplication = await Application.findByIdAndUpdate(
+      id,
+      { status },
+      { new: true }
+    );
+
+    if (!updatedApplication) {
+      return new Response(JSON.stringify({ message: 'Application not found' }), {
+        headers: { 'Content-Type': 'application/json' },
+        status: 404,
+      });
+    }
+
+    return new Response(JSON.stringify({ message: 'Application status updated successfully', application: updatedApplication }), {
+      headers: { 'Content-Type': 'application/json' },
+      status: 200,
+    });
+  } catch (error) {
+    console.error('Error updating application status:', error);
+    return new Response(JSON.stringify({ message: 'Failed to update application status' }), {
+      headers: { 'Content-Type': 'application/json' },
+      status: 500,
+    });
+  }
+}
+
 // Handle DELETE request to delete an application
 export async function DELETE(req) {
   await connectToDatabase();

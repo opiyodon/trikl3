@@ -8,22 +8,33 @@ import Link from 'next/link';
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import FuturisticLoader from '@/components/FuturisticLoader';
+import { motion } from 'framer-motion';
 
 const ResourcesCard = ({ resource }) => (
-  <Card className="mb-4 hover:shadow-lg transition-shadow duration-200">
-    <CardBody>
-      <h3 className="text-xl font-semibold mb-2">{resource.position}</h3>
-      <p className="text-sm text-gray-500 mb-2">{resource.companyName} - {resource.location}</p>
-      <Divider className="my-3" />
-      <p className="text-sm line-clamp-3">{resource.description}</p>
-    </CardBody>
-    <CardFooter className="flex justify-between">
-      <p className="text-sm">Duration: {resource.duration} weeks</p>
-      <Link href={`/company-dashboard/resources/${resource._id}`}>
-        <Button color="primary" size="sm">Manage</Button>
-      </Link>
-    </CardFooter>
-  </Card>
+  <motion.div
+    whileHover={{ scale: 1.03 }}
+    whileTap={{ scale: 0.98 }}
+    initial={{ opacity: 0, y: 20 }}
+    animate={{ opacity: 1, y: 0 }}
+    transition={{ duration: 0.3 }}
+  >
+    <Card className="mb-4 overflow-hidden bg-gradient-to-br from-white to-gray-100 shadow-lg">
+      <CardBody className="p-6">
+        <h3 className="text-2xl font-bold mb-2 text-pri">{resource.position}</h3>
+        <p className="text-sm text-gray-600 mb-3">{resource.companyName} - {resource.location}</p>
+        <Divider className="my-4" />
+        <p className="text-sm line-clamp-3 text-gray-700">{resource.description}</p>
+      </CardBody>
+      <CardFooter className="flex justify-between items-center bg-gray-50 p-4">
+        <p className="text-sm font-semibold text-gray-600">Duration: {resource.duration} weeks</p>
+        <Link href={`/company-dashboard/manage-resource?id=${resource._id}`}>
+          <Button className="btnPri font-semibold tracking-wide">
+            Manage
+          </Button>
+        </Link>
+      </CardFooter>
+    </Card>
+  </motion.div>
 );
 
 export default function CompanyResources() {
@@ -62,20 +73,48 @@ export default function CompanyResources() {
   return (
     <Container>
       <ToastContainer position="top-right" autoClose={5000} />
-      <div className="flex justify-between items-center mb-8">
-        <h1 className="text-3xl font-bold">Your Resources</h1>
+      <motion.div
+        initial={{ opacity: 0, y: -20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5 }}
+        className="flex flex-col md:flex-row justify-between items-center mb-12"
+      >
+        <h1 className="text-4xl font-extrabold text-gray-800 mb-6 md:mb-0">
+          Your Resources
+        </h1>
         <Link href="/company-dashboard/post-resources">
-          <Button color="success" size="lg">Post New Resource</Button>
+          <Button color="success" size="lg" className="font-bold tracking-wide">
+            Post New Resource
+          </Button>
         </Link>
-      </div>
+      </motion.div>
       {resources.length === 0 ? (
-        <p className="text-center text-gray-500 mt-8">You haven't posted any resources yet.</p>
+        <motion.p
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.2 }}
+          className="text-center text-xl text-gray-500 mt-12"
+        >
+          You haven't posted any resources yet.
+        </motion.p>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {resources.map(resource => (
-            <ResourcesCard key={resource._id} resource={resource} />
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.2 }}
+          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"
+        >
+          {resources.map((resource, index) => (
+            <motion.div
+              key={resource._id}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: index * 0.1 }}
+            >
+              <ResourcesCard resource={resource} />
+            </motion.div>
           ))}
-        </div>
+        </motion.div>
       )}
     </Container>
   );

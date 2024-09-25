@@ -1,7 +1,7 @@
 import mongoose from 'mongoose';
 
 const CompanySchema = new mongoose.Schema({
-    companyName: String,
+    companyName: { type: String, required: true },
     email: { type: String, unique: true, required: true },
     password: { type: String, required: true },
     industry: String,
@@ -9,8 +9,8 @@ const CompanySchema = new mongoose.Schema({
     logo: String,
     website: String,
     location: String,
-    size: String,
-    profileCompleted: { type: Boolean, default: false },
+    size: Number,
+    profileStrength: { type: Number, default: 0, min: 0, max: 100 },
 }, { timestamps: true });
 
 export default mongoose.models.Company || mongoose.model('Company', CompanySchema);

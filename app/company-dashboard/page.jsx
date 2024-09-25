@@ -1,107 +1,120 @@
 'use client'
 
-import { useState, useEffect } from 'react';
-import { Card, CardBody, CardFooter, Button } from "@nextui-org/react";
-import Container from '@/components/pageLayout/Container';
+import React, { useState, useEffect } from 'react';
+import { Card, CardBody, CardHeader, Button, Progress } from "@nextui-org/react";
 import { useSession } from 'next-auth/react';
 import Link from 'next/link';
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import ApplicationCard from '@/components/company/ApplicationCard';
+import FuturisticLoader from '@/components/FuturisticLoader';
+import Container from '@/components/pageLayout/Container';
 
-export default function Dashboard() {
+const ApplicationCard = ({ application }) => (
+  <Card className="mb-4">
+    <CardBody>
+      <h3 className="text-lg font-semibold mb-2">{application.studentName}</h3>
+      <p className="mb-2">Position: {application.jobDetails.title}</p>
+      <p className="mb-2">Status: {application.status}</p>
+    </CardBody>
+  </Card>
+);
+
+const Dashboard = () => {
   const { data: session } = useSession();
+  const [company, setCompany] = useState(null);
   const [applications, setApplications] = useState([]);
-  const [companyProfile, setCompanyProfile] = useState(null);
+  const [attachments, setAttachments] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     const fetchData = async () => {
       if (session?.user?.email) {
-        const [applicationsResponse, profileResponse] = await Promise.all([
-          fetch(`/api/applications?companyEmail=${session.user.email}`),
-          fetch(`/api/companies?email=${session.user.email}`)
-        ]);
+        try {
+          const [companyResponse, applicationsResponse, attachmentsResponse] = await Promise.all([
+            fetch(`/api/companies?email=${session.user.email}`),
+            fetch(`/api/applications?companyName=${encodeURIComponent(session.user.name)}`),
+            fetch(`/api/attachments?companyEmail=${session.user.email}`)
+          ]);
 
-        const applicationsData = await applicationsResponse.json();
-        const profileData = await profileResponse.json();
+          const companyData = await companyResponse.json();
+          const applicationsData = await applicationsResponse.json();
+          const attachmentsData = await attachmentsResponse.json();
 
-        setApplications(applicationsData);
-        setCompanyProfile(profileData);
+          setCompany(companyData);
+          setApplications(applicationsData);
+          setAttachments(attachmentsData);
+        } catch (error) {
+          console.error('Failed to fetch data:', error);
+          toast.error('Failed to load dashboard data');
+        } finally {
+          setIsLoading(false);
+        }
       }
     };
 
     fetchData();
   }, [session]);
 
-  const updateStatus = async (applicationId, status) => {
-    try {
-      const response = await fetch(`/api/applications/${applicationId}`, {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ status })
-      });
-
-      if (response.ok) {
-        setApplications(prevApplications => prevApplications.map(app =>
-          app._id === applicationId ? { ...app, status } : app
-        ));
-        toast.success(`Application status updated to ${status}`);
-      } else {
-        toast.error('Failed to update application status.');
-      }
-    } catch (error) {
-      toast.error('Failed to update application status.');
-    }
-  };
+  if (isLoading) {
+    return (
+      <Container>
+        <FuturisticLoader />
+      </Container>
+    );
+  }
 
   return (
     <Container>
-      <ToastContainer position="top-right" autoClose={5000} />
-      <h1 className="text-3xl font-bold mb-8">Company Dashboard</h1>
-
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+      <div className="mb-12">
+        <ToastContainer position="top-right" autoClose={5000} />
+        <h1 className="text-4xl font-bold mb-4">Welcome back, {company?.companyName || 'Company'}!</h1>
+        <p className="mb-8">
+          Let's manage your internships and find great talent.
+        </p>
         <Card>
+          <CardHeader>
+            <h2 className="text-2xl font-bold">Profile Completion</h2>
+          </CardHeader>
           <CardBody>
-            <h2 className="text-xl font-semibold mb-2">Company Profile</h2>
-            <p>Name: {companyProfile?.name || 'Not set'}</p>
-            <p>Email: {companyProfile?.email || 'Not set'}</p>
-            <p>Industry: {companyProfile?.industry || 'Not set'}</p>
+            <Progress color="secondary" value={company?.profileStrength || 0} className="mb-4" />
+            <p>{company?.profileStrength || 0}% complete</p>
+            <Button as={Link} href="/company-dashboard/account" className="btnPri mt-4 w-fit">
+              {company?.profileStrength === 100 ? 'View your profile' : 'Complete your profile'}
+            </Button>
           </CardBody>
-          <CardFooter>
-            <Link href="/company-dashboard/account">
-              <Button color="primary">Edit Profile</Button>
-            </Link>
-          </CardFooter>
         </Card>
 
-        <Card>
-          <CardBody>
-            <h2 className="text-xl font-semibold mb-2">Quick Actions</h2>
-            <div className="flex flex-col gap-2">
-              <Link href="/company-dashboard/post-attachment">
-                <Button color="success" className="w-full">Post New Attachment</Button>
-              </Link>
-              <Link href="/company-dashboard/attachments">
-                <Button color="secondary" className="w-full">View All Attachments</Button>
-              </Link>
+        <div className="mb-12 mt-8">
+          <h2 className="text-2xl font-bold mb-4">Recent Applications</h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {applications.slice(0, 6).map(application => (
+              <ApplicationCard key={application._id} application={application} />
+            ))}
+          </div>
+          {applications.length > 6 && (
+            <div className="mt-6 text-center">
+              <Button as={Link} href="/company-dashboard/applications" color="primary">
+                View All Applications
+              </Button>
             </div>
+          )}
+        </div>
+
+        <Card>
+          <CardHeader>
+            <h2 className="text-2xl font-bold">Company Stats</h2>
+          </CardHeader>
+          <CardBody>
+            <p>Active Attachments: {attachments.length}</p>
+            <p>Total Applications: {applications.length}</p>
+            <p>Pending Review: {applications.filter(app => app.status === 'Pending').length}</p>
+            <p>Accepted Applications: {applications.filter(app => app.status === 'Accepted').length}</p>
+            <p>Rejected Applications: {applications.filter(app => app.status === 'Denied').length}</p>
           </CardBody>
         </Card>
       </div>
-
-      <h2 className="text-2xl font-semibold mb-4">Recent Applications</h2>
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-        {applications.slice(0, 6).map(application => (
-          <ApplicationCard key={application._id} application={application} updateStatus={updateStatus} />
-        ))}
-      </div>
-      {applications.length > 6 && (
-        <div className="mt-4 text-center">
-          <Link href="/company-dashboard/applications">
-            <Button color="primary">View All Applications</Button>
-          </Link>
-        </div>
-      )}
     </Container>
   );
-}
+};
+
+export default Dashboard;

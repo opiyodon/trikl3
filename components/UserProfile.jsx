@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from "react";
-import { Dropdown, DropdownItem, DropdownTrigger, DropdownMenu, Avatar } from "@nextui-org/react";
+import { Dropdown, DropdownTrigger, DropdownMenu, DropdownItem, Avatar, Button } from "@nextui-org/react";
 import { signOut, useSession } from "next-auth/react";
 import { toast } from 'react-toastify';
+import Link from 'next/link';
 
 const UserProfile = () => {
   const { data: session } = useSession();
@@ -45,11 +46,19 @@ const UserProfile = () => {
   };
 
   const getProfilePicture = () => {
-    return userData?.profilePicture || "/assets/avatar.png";
+    if (session.user.userType === 'student') {
+      return userData?.profilePicture || "/assets/avatar.png";
+    } else {
+      return userData?.logo || "/assets/company-logo.png";
+    }
+  };
+
+  const getProfileStrength = () => {
+    return userData?.profileStrength || 0;
   };
 
   return (
-    <Dropdown placement="bottom-end">
+    <Dropdown>
       <DropdownTrigger>
         <Avatar
           isBordered
@@ -61,14 +70,26 @@ const UserProfile = () => {
           src={getProfilePicture()}
         />
       </DropdownTrigger>
-      <DropdownMenu aria-label="Profile Actions" variant="flat">
-        <DropdownItem key="profile" className="h-14 gap-2">
-          <p className="font-semibold">Signed in as</p>
+      <DropdownMenu aria-label="Profile Actions" variant="flat" className="p-3 w-full">
+        <DropdownItem key="header" className="h-full gap-2 cursor-text" textValue="Profile Header">
+          <p className="font-bold text-large">
+            {session.user.userType === 'student' ? 'Student' : 'Company'} Profile
+          </p>
+        </DropdownItem>
+        <DropdownItem key="signed-in" className="h-full gap-2 cursor-text" textValue="Signed in as">
+          <p className="text-sm text-gray-500">Signed in as</p>
           <p className="font-semibold">{userData?.email || session?.user?.email}</p>
         </DropdownItem>
-        <DropdownItem key="settings" href={`/${session.user.userType}-dashboard/account`}>My Account</DropdownItem>
-        <DropdownItem key="logout" color="danger" onPress={handleLogout}>
-          Log Out
+        <DropdownItem key="profile-strength" textValue="Profile Strength">
+          <p className="text-sm text-gray-500 cursor-text">Profile Strength: {getProfileStrength()}%</p>
+        </DropdownItem>
+        <DropdownItem key="my-account" className="h-full" textValue="My Account">
+          <Link href={`/${session.user.userType}-dashboard/account`} className="text-sm text-primary">
+            My Account
+          </Link>
+        </DropdownItem>
+        <DropdownItem key="logout" className="h-full text-danger" color="danger" textValue="Log Out">
+          <span className="text-sm" onClick={handleLogout}>Log Out</span>
         </DropdownItem>
       </DropdownMenu>
     </Dropdown>
