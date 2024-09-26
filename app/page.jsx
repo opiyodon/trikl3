@@ -5,13 +5,18 @@ import { Card, CardBody, CardHeader, CardFooter, Image, Button, Link } from "@ne
 import Container from '@/components/pageLayout/Container';
 import FuturisticLoader from '@/components/FuturisticLoader';
 
-const API_KEY = process.env.NEXT_PUBLIC_RAPID_API_KEY;
+const API_KEYS = [
+  process.env.NEXT_PUBLIC_RAPID_API_KEY_1,
+  process.env.NEXT_PUBLIC_RAPID_API_KEY_2,
+  process.env.NEXT_PUBLIC_RAPID_API_KEY_3
+];
 const UNSPLASH_ACCESS_KEY = process.env.NEXT_PUBLIC_UNSPLASH_ACCESS_KEY;
 
 const LandingPage = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [currentSlide, setCurrentSlide] = useState(0);
   const [carouselItems, setCarouselItems] = useState([]);
+  const [currentKeyIndex, setCurrentKeyIndex] = useState(0);
 
   const fetchJobs = async () => {
     try {
@@ -20,11 +25,17 @@ const LandingPage = () => {
         {
           method: 'GET',
           headers: {
-            'X-RapidAPI-Key': API_KEY,
+            'X-RapidAPI-Key': API_KEYS[currentKeyIndex],
             'X-RapidAPI-Host': 'jsearch.p.rapidapi.com'
           }
         }
       );
+
+      if (response.status === 429) {
+        // Rate limit exceeded, switch to next API key
+        setCurrentKeyIndex((prevIndex) => (prevIndex + 1) % API_KEYS.length);
+        throw new Error('Rate limit exceeded. Switching to next API key. Please try again.');
+      }
 
       if (!response.ok) {
         throw new Error('API request failed');

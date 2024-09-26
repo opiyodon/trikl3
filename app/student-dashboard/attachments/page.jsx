@@ -52,7 +52,11 @@ const SearchIcon = (props) => (
   </svg>
 );
 
-const API_KEY = process.env.NEXT_PUBLIC_RAPID_API_KEY;
+const API_KEYS = [
+  process.env.NEXT_PUBLIC_RAPID_API_KEY_1,
+  process.env.NEXT_PUBLIC_RAPID_API_KEY_2,
+  process.env.NEXT_PUBLIC_RAPID_API_KEY_3
+];
 
 // Simple cache implementation
 const cache = new Map();
@@ -69,6 +73,7 @@ export default function AttachmentOpportunitiesPage() {
   const [totalPages, setTotalPages] = useState(1);
   const lastRequestTime = useRef(0);
   const router = useRouter();
+  const [currentKeyIndex, setCurrentKeyIndex] = useState(0);
 
   const fetchLocalOpportunities = useCallback(async () => {
     try {
@@ -108,7 +113,7 @@ export default function AttachmentOpportunitiesPage() {
         {
           method: 'GET',
           headers: {
-            'X-RapidAPI-Key': API_KEY,
+            'X-RapidAPI-Key': API_KEYS[currentKeyIndex],
             'X-RapidAPI-Host': 'jsearch.p.rapidapi.com'
           }
         }
@@ -117,7 +122,9 @@ export default function AttachmentOpportunitiesPage() {
       lastRequestTime.current = Date.now();
 
       if (response.status === 429) {
-        throw new Error('Rate limit exceeded. Please try again in a few moments.');
+        // Rate limit exceeded, switch to next API key
+        setCurrentKeyIndex((prevIndex) => (prevIndex + 1) % API_KEYS.length);
+        throw new Error('Rate limit exceeded. Switching to next API key. Please try again.');
       }
 
       if (!response.ok) {
@@ -141,7 +148,7 @@ export default function AttachmentOpportunitiesPage() {
     } finally {
       setIsLoading(false);
     }
-  }, []);
+  }, [currentKeyIndex]);
 
   useEffect(() => {
     const debounceTimer = setTimeout(() => {

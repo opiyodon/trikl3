@@ -11,7 +11,7 @@ const Activity = ({ userEmail }) => {
     const fetchActivity = async () => {
       if (userEmail) {
         try {
-          const response = await fetch(`/api/applications?email=${userEmail}`);
+          const response = await fetch(`/api/applications?email=${userEmail}&sort=desc`);
           const data = await response.json();
           setRecentActivity(data.slice(0, 5)); // Get the 5 most recent activities
         } catch (error) {
@@ -34,8 +34,8 @@ const Activity = ({ userEmail }) => {
       <h2 className="text-2xl font-bold mb-4">Your Recent Activity</h2>
       {recentActivity.map((activity, index) => (
         <ActivityCard
-          key={index}
-          title={`Applied to attachment`}
+          key={activity._id}
+          title={`Applied to ${activity.jobDetails.title}`}
           description={`On ${new Date(activity.createdAt).toLocaleDateString()}`}
           buttonText="View Application"
           buttonLink={`/student-dashboard/applications`}

@@ -1,13 +1,17 @@
 import { useState, useEffect } from 'react';
-import { Card, CardBody } from "@nextui-org/react";
 import RecommendedCard from "./RecommendedCard";
 import FuturisticLoader from "./FuturisticLoader";
 
-const API_KEY = process.env.NEXT_PUBLIC_RAPID_API_KEY;
+const API_KEYS = [
+  process.env.NEXT_PUBLIC_RAPID_API_KEY_1,
+  process.env.NEXT_PUBLIC_RAPID_API_KEY_2,
+  process.env.NEXT_PUBLIC_RAPID_API_KEY_3
+];
 
 const Recommended = ({ userProfile }) => {
   const [recommendations, setRecommendations] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [currentKeyIndex, setCurrentKeyIndex] = useState(0);
 
   useEffect(() => {
     const fetchRecommendations = async () => {
@@ -19,11 +23,17 @@ const Recommended = ({ userProfile }) => {
             {
               method: 'GET',
               headers: {
-                'X-RapidAPI-Key': API_KEY,
+                'X-RapidAPI-Key': API_KEYS[currentKeyIndex],
                 'X-RapidAPI-Host': 'jsearch.p.rapidapi.com'
               }
             }
           );
+
+          if (response.status === 429) {
+            // Rate limit exceeded, switch to next API key
+            setCurrentKeyIndex((prevIndex) => (prevIndex + 1) % API_KEYS.length);
+            throw new Error('Rate limit exceeded. Switching to next API key. Please try again.');
+          }
 
           if (!response.ok) {
             throw new Error('API request failed');
@@ -45,7 +55,7 @@ const Recommended = ({ userProfile }) => {
     };
 
     fetchRecommendations();
-  }, [userProfile]);
+  }, [userProfile, currentKeyIndex]);
 
   if (isLoading) {
     return <FuturisticLoader />;

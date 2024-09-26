@@ -4,7 +4,7 @@ const Footer = () => {
   return (
     <footer className="bg-gray-100 mt-16 py-8">
       <div className="container mx-auto px-4">
-        <p className="text-center text-gray-600">© 2024 Trikl3 | All Rights Reserved</p>
+        <p className="text-center text-gray-600 text-sm md:text-base">© 2024 Trikl3 | All Rights Reserved</p>
       </div>
     </footer>
   );

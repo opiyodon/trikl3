@@ -114,7 +114,7 @@ export default function ApplicationsPage() {
         isOpen={isOpen}
         onClose={onClose}
         scrollBehavior="inside"
-        className="h-[90vh] max-w-4xl mx-auto mt-[5vh]"
+        className="h-[90vh] max-w-4xl mx-4 my-10 md:mx-auto md:mt-[5vh]"
       >
         <ModalContent>
           {(onClose) => (

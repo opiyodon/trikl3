@@ -48,7 +48,11 @@ const SearchIcon = (props) => (
   </svg>
 );
 
-const API_KEY = process.env.NEXT_PUBLIC_RAPID_API_KEY;
+const API_KEYS = [
+  process.env.NEXT_PUBLIC_RAPID_API_KEY_1,
+  process.env.NEXT_PUBLIC_RAPID_API_KEY_2,
+  process.env.NEXT_PUBLIC_RAPID_API_KEY_3
+];
 const JSEARCH_HOST = 'jsearch.p.rapidapi.com';
 const LINKEDIN_SCRAPER_HOST = 'linkedin-profile-data-scraper.p.rapidapi.com';
 
@@ -68,6 +72,7 @@ export default function ResourcesPage() {
   const [selectedResource, setSelectedResource] = useState(null);
   const [isModalLoading, setIsModalLoading] = useState(false);
   const router = useRouter();
+  const [currentKeyIndex, setCurrentKeyIndex] = useState(0);
 
   const fetchResources = useCallback(async (page, search = '') => {
     setIsLoading(true);
@@ -96,13 +101,19 @@ export default function ResourcesPage() {
         {
           method: 'GET',
           headers: {
-            'X-RapidAPI-Key': API_KEY,
+            'X-RapidAPI-Key': API_KEYS[currentKeyIndex],
             'X-RapidAPI-Host': JSEARCH_HOST
           }
         }
       );
 
       lastRequestTime.current = Date.now();
+
+      if (jobsResponse.status === 429) {
+        // Rate limit exceeded, switch to next API key
+        setCurrentKeyIndex((prevIndex) => (prevIndex + 1) % API_KEYS.length);
+        throw new Error('Rate limit exceeded. Switching to next API key. Please try again.');
+      }
 
       if (!jobsResponse.ok) {
         throw new Error('API request failed');
@@ -131,7 +142,7 @@ export default function ResourcesPage() {
     } finally {
       setIsLoading(false);
     }
-  }, []);
+  }, [currentKeyIndex]);
 
   useEffect(() => {
     const debounceTimer = setTimeout(() => {
@@ -170,11 +181,16 @@ export default function ResourcesPage() {
         {
           method: 'GET',
           headers: {
-            'X-RapidAPI-Key': API_KEY,
+            'X-RapidAPI-Key': API_KEYS[currentKeyIndex],
             'X-RapidAPI-Host': LINKEDIN_SCRAPER_HOST
           }
         }
       );
+      if (companyResponse.status === 429) {
+        // Rate limit exceeded, switch to next API key
+        setCurrentKeyIndex((prevIndex) => (prevIndex + 1) % API_KEYS.length);
+        throw new Error('Rate limit exceeded. Switching to next API key. Please try again.');
+      }
       if (companyResponse.ok) {
         const companyData = await companyResponse.json();
         setSelectedResource(prev => ({ ...prev, companyDetails: companyData }));
@@ -248,7 +264,7 @@ export default function ResourcesPage() {
         isOpen={isOpen}
         onClose={onClose}
         scrollBehavior="inside"
-        className="h-[90vh] max-w-4xl mx-auto mt-[5vh]"
+        className="h-[90vh] max-w-4xl mx-4 my-10 md:mx-auto md:mt-[5vh]"
       >
         <ModalContent>
           {(onClose) => (

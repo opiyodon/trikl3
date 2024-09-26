@@ -55,3 +55,65 @@ body {
     @apply text-light_txt2 bg-pri hover:bg-pri transition duration-300 ease-in-out;
 }
 
+/* Mobile responsiveness */
+@media (max-width: 768px) {
+    html {
+        font-size: 14px;
+    }
+
+    ::-webkit-scrollbar {
+        width: 0.8vw;
+    }
+
+    .container {
+        padding-left: 1rem;
+        padding-right: 1rem;
+    }
+
+    .btnPri, .btnSec {
+        width: 100%;
+        margin-bottom: 0.5rem;
+    }
+}
+
+/* Sidebar styles */
+.sidebar {
+    transition: transform 0.3s ease-in-out;
+}
+
+.sidebar-overlay {
+    transition: opacity 0.3s ease-in-out;
+}
+
+body.sidebar-open {
+    overflow: hidden;
+}
+
+/* Menu toggle button styles */
+.menu-toggle-btn {
+    transition: all 0.3s ease-in-out;
+}
+
+.menu-toggle-btn:hover {
+    background-color: var(--light_bg_bright);
+}
+
+.menu-toggle-btn svg {
+    transition: transform 0.3s ease-in-out;
+}
+
+/* React-Toastify mobile responsiveness */
+@media (max-width: 768px) {
+    .Toastify__toast-container {
+      width: 90vw;
+      padding: 0;
+      left: 5vw;
+      bottom: 5vh;
+    }
+    .Toastify__toast {
+      margin-bottom: 1rem;
+    }
+    .Toastify__toast-body {
+      font-size: 14px;
+    }
+  }
