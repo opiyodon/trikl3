@@ -36,21 +36,6 @@ export default function ApplicationsPage() {
     }
   }, [session, fetchApplications]);
 
-  const handleDelete = async (id) => {
-    try {
-      const response = await fetch(`/api/applications?id=${id}`, { method: 'DELETE' });
-      if (response.ok) {
-        setApplications(applications.filter(app => app._id !== id));
-        toast.success('Application deleted successfully.');
-      } else {
-        toast.error('Failed to delete application. Please try again.');
-      }
-    } catch (error) {
-      console.error('Error deleting application:', error);
-      toast.error('An error occurred. Please try again.');
-    }
-  };
-
   const handleStatusChange = async (id, newStatus) => {
     try {
       const response = await fetch('/api/applications', {
@@ -100,7 +85,6 @@ export default function ApplicationsPage() {
                 company: application.studentName // Use studentName as company for display
               }
             }}
-            onDelete={handleDelete}
             onViewDetails={handleViewDetails}
             isCompanyView={true} // Add this prop to indicate company view
           />
@@ -167,9 +151,6 @@ export default function ApplicationsPage() {
                 </article>
               </ModalBody>
               <ModalFooter>
-                <Button color="danger" onPress={() => { handleDelete(selectedApplication._id); onClose(); }}>
-                  Delete Application
-                </Button>
                 <Button className="btnPri" onPress={onClose}>
                   Close
                 </Button>

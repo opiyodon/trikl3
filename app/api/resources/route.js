@@ -36,7 +36,7 @@ export async function GET(req) {
 
 export async function POST(req) {
   try {
-    const { companyName, position, location, description, requirements, duration, companyEmail } = await req.json();
+    const { companyName, position, location, description, duration, companyEmail } = await req.json();
     await connectToDatabase();
 
     const newResource = new Resource({
@@ -44,7 +44,6 @@ export async function POST(req) {
       position,
       location,
       description,
-      requirements,
       duration,
       companyEmail
     });

@@ -18,7 +18,6 @@ export default function PostResourceForm() {
         position: '',
         location: '',
         description: '',
-        requirements: '',
         duration: ''
     });
     const [errors, setErrors] = useState({});
@@ -37,7 +36,6 @@ export default function PostResourceForm() {
         if (!resource.position) newErrors.position = 'Position is required';
         if (!resource.location) newErrors.location = 'Location is required';
         if (!resource.description) newErrors.description = 'Description is required';
-        if (!resource.requirements) newErrors.requirements = 'Requirements are required';
         if (!resource.duration) newErrors.duration = 'Duration is required';
 
         if (Object.keys(newErrors).length > 0) {
@@ -110,14 +108,6 @@ export default function PostResourceForm() {
                             className="mb-4"
                             isInvalid={errors.description}
                             errorMessage={errors.description}
-                        />
-                        <Textarea
-                            label="Requirements"
-                            value={resource.requirements}
-                            onChange={(e) => setResource({ ...resource, requirements: e.target.value })}
-                            className="mb-4"
-                            isInvalid={errors.requirements}
-                            errorMessage={errors.requirements}
                         />
                         <Input
                             label="Duration (in weeks)"

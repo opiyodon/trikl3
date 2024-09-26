@@ -120,12 +120,6 @@ export default function ManageAttachmentForm() {
               onChange={(e) => setAttachment({ ...attachment, description: e.target.value })}
               className="mb-4"
             />
-            <Textarea
-              label="Requirements"
-              value={attachment.requirements}
-              onChange={(e) => setAttachment({ ...attachment, requirements: e.target.value })}
-              className="mb-4"
-            />
             <Input
               label="Duration (in weeks)"
               type="number"

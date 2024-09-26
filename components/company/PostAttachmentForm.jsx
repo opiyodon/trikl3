@@ -18,7 +18,6 @@ export default function PostAttachmentForm() {
         position: '',
         location: '',
         description: '',
-        requirements: '',
         duration: ''
     });
     const [errors, setErrors] = useState({});
@@ -37,7 +36,6 @@ export default function PostAttachmentForm() {
         if (!attachment.position) newErrors.position = 'Position is required';
         if (!attachment.location) newErrors.location = 'Location is required';
         if (!attachment.description) newErrors.description = 'Description is required';
-        if (!attachment.requirements) newErrors.requirements = 'Requirements are required';
         if (!attachment.duration) newErrors.duration = 'Duration is required';
 
         if (Object.keys(newErrors).length > 0) {
@@ -110,14 +108,6 @@ export default function PostAttachmentForm() {
                             className="mb-4"
                             isInvalid={errors.description}
                             errorMessage={errors.description}
-                        />
-                        <Textarea
-                            label="Requirements"
-                            value={attachment.requirements}
-                            onChange={(e) => setAttachment({ ...attachment, requirements: e.target.value })}
-                            className="mb-4"
-                            isInvalid={errors.requirements}
-                            errorMessage={errors.requirements}
                         />
                         <Input
                             label="Duration (in weeks)"

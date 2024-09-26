@@ -120,12 +120,6 @@ export default function ManageResourceForm() {
               onChange={(e) => setResource({ ...resource, description: e.target.value })}
               className="mb-4"
             />
-            <Textarea
-              label="Requirements"
-              value={resource.requirements}
-              onChange={(e) => setResource({ ...resource, requirements: e.target.value })}
-              className="mb-4"
-            />
             <Input
               label="Duration (in weeks)"
               type="number"

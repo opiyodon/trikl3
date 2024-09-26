@@ -4,7 +4,7 @@ import Image from 'next/image';
 
 const UNSPLASH_ACCESS_KEY = process.env.NEXT_PUBLIC_UNSPLASH_ACCESS_KEY;
 
-const ApplicationCard = ({ application, onDelete, onViewDetails }) => {
+const ApplicationCard = ({ application, onViewDetails }) => {
     const [imageUrl, setImageUrl] = useState('');
 
     useEffect(() => {
@@ -42,9 +42,8 @@ const ApplicationCard = ({ application, onDelete, onViewDetails }) => {
                     <p className="text-sm mb-2">Applied on: {new Date(application.createdAt).toLocaleDateString()}</p>
                 </div>
             </CardBody>
-            <CardFooter className="justify-between">
+            <CardFooter className="justify-center">
                 <Button color="primary" onClick={() => onViewDetails(application)} className="w-1/2 mr-2">View Details</Button>
-                <Button color="danger" onClick={() => onDelete(application._id)} className="w-1/2">Delete</Button>
             </CardFooter>
         </Card>
     );

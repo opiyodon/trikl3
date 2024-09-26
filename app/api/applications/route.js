@@ -99,24 +99,3 @@ export async function PUT(req) {
     });
   }
 }
-
-// Handle DELETE request to delete an application
-export async function DELETE(req) {
-  await connectToDatabase();
-  const { searchParams } = new URL(req.url);
-  const id = searchParams.get('id');
-
-  try {
-    await Application.findByIdAndDelete(id);
-    return new Response(JSON.stringify({ message: 'Application deleted successfully' }), {
-      headers: { 'Content-Type': 'application/json' },
-      status: 200,
-    });
-  } catch (error) {
-    console.error('Error deleting application:', error);
-    return new Response(JSON.stringify({ message: 'Failed to delete application' }), {
-      headers: { 'Content-Type': 'application/json' },
-      status: 500,
-    });
-  }
-}

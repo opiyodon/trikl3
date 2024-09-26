@@ -36,21 +36,6 @@ export default function ApplicationsPage() {
     }
   }, [session, fetchApplications]);
 
-  const handleDelete = async (id) => {
-    try {
-      const response = await fetch(`/api/applications?id=${id}`, { method: 'DELETE' });
-      if (response.ok) {
-        setApplications(applications.filter(app => app._id !== id));
-        toast.success('Application deleted successfully.');
-      } else {
-        toast.error('Failed to delete application. Please try again.');
-      }
-    } catch (error) {
-      console.error('Error deleting application:', error);
-      toast.error('An error occurred. Please try again.');
-    }
-  };
-
   const handleViewDetails = (application) => {
     setSelectedApplication(application);
     onOpen();
@@ -73,7 +58,6 @@ export default function ApplicationsPage() {
           <ApplicationCard
             key={application._id}
             application={application}
-            onDelete={handleDelete}
             onViewDetails={handleViewDetails}
           />
         ))}

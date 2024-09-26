@@ -5,6 +5,8 @@ import { Input, Button, Card, CardBody, CardFooter, Modal, ModalContent, ModalHe
 import { useRouter } from 'next/navigation';
 import Container from '@/components/pageLayout/Container';
 import FuturisticLoader from '@/components/FuturisticLoader';
+import { toast, ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 const ResourceCard = ({ title, description, type, companyName, logoUrl, onClick }) => (
   <Card className="mb-4 h-[300px] flex flex-col hover:shadow-lg transition-shadow duration-300">
@@ -62,6 +64,7 @@ const cache = new Map();
 export default function ResourcesPage() {
   const [searchTerm, setSearchTerm] = useState('');
   const [resources, setResources] = useState([]);
+  const [localResources, setLocalResources] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [isInitialLoading, setIsInitialLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -73,6 +76,17 @@ export default function ResourcesPage() {
   const [isModalLoading, setIsModalLoading] = useState(false);
   const router = useRouter();
   const [currentKeyIndex, setCurrentKeyIndex] = useState(0);
+
+  const fetchLocalResources = useCallback(async () => {
+    try {
+      const response = await fetch('/api/resources');
+      const data = await response.json();
+      setLocalResources(data);
+    } catch (error) {
+      console.error('Failed to fetch local resources:', error);
+      toast.error('Failed to fetch local resources. Please try again.');
+    }
+  }, []);
 
   const fetchResources = useCallback(async (page, search = '') => {
     setIsLoading(true);
@@ -154,6 +168,10 @@ export default function ResourcesPage() {
     return () => clearTimeout(debounceTimer);
   }, [fetchResources, searchTerm]);
 
+  useEffect(() => {
+    fetchLocalResources();
+  }, [fetchLocalResources]);
+
   const loadMore = () => {
     if (currentPage < totalPages) {
       fetchResources(currentPage + 1, searchTerm);
@@ -224,6 +242,7 @@ export default function ResourcesPage() {
 
   return (
     <Container>
+      <ToastContainer position="top-right" autoClose={5000} />
       <h1 className="text-3xl font-bold mb-8">Job and Internship Resources for Students</h1>
       <Input
         placeholder="Search for internships or entry-level jobs..."
@@ -242,6 +261,17 @@ export default function ResourcesPage() {
         <FuturisticLoader />
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          {localResources.map((resource) => (
+            <ResourceCard
+              key={resource._id}
+              title={resource.title}
+              description={resource.description}
+              type={resource.type}
+              companyName={resource.companyName}
+              logoUrl={resource.logoUrl}
+              onClick={() => handleCardClick(resource)}
+            />
+          ))}
           {resources.map((resource) => (
             <ResourceCard
               key={resource.job_id}
@@ -270,8 +300,8 @@ export default function ResourcesPage() {
           {(onClose) => (
             <>
               <ModalHeader className="flex flex-col gap-1">
-                <h2 className="text-2xl font-bold">{selectedResource?.job_title}</h2>
-                <p className="text-lg">{selectedResource?.employer_name}</p>
+                <h2 className="text-2xl font-bold">{selectedResource?.job_title || selectedResource?.title}</h2>
+                <p className="text-lg">{selectedResource?.employer_name || selectedResource?.companyName}</p>
               </ModalHeader>
               <ModalBody className="overflow-y-auto">
                 {isModalLoading ? (
@@ -280,18 +310,18 @@ export default function ResourcesPage() {
                   <article className="prose max-w-none">
                     <section>
                       <h3 className="text-xl font-semibold mb-2">Job Details</h3>
-                      <p><strong>Location:</strong> {selectedResource?.job_city}, {selectedResource?.job_country}</p>
-                      <p><strong>Job Type:</strong> {selectedResource?.job_employment_type}</p>
+                      <p><strong>Location:</strong> {selectedResource?.job_city || selectedResource?.location}, {selectedResource?.job_country}</p>
+                      <p><strong>Job Type:</strong> {selectedResource?.job_employment_type || selectedResource?.type}</p>
                     </section>
 
                     <section className="mt-6">
                       <h3 className="text-xl font-semibold mb-2">Job Description</h3>
-                      {formatJobDescription(selectedResource?.job_description)}
+                      {formatJobDescription(selectedResource?.job_description || selectedResource?.description)}
                     </section>
 
                     {selectedResource?.companyDetails && (
                       <section className="mt-6">
-                        <h3 className="text-xl font-semibold mb-2">About {selectedResource.employer_name}</h3>
+                        <h3 className="text-xl font-semibold mb-2">About {selectedResource.employer_name || selectedResource.companyName}</h3>
                         <p>{selectedResource.companyDetails.description}</p>
                         <p><strong>Industry:</strong> {selectedResource.companyDetails.industry}</p>
                         <p><strong>Company Size:</strong> {selectedResource.companyDetails.companySize}</p>
@@ -301,8 +331,8 @@ export default function ResourcesPage() {
                       </section>
                     )}
 
-                    {selectedResource?.employer_logo && (
-                      <Image src={selectedResource.employer_logo} alt={`${selectedResource.employer_name} logo`} className="mt-6 max-w-xs mx-auto" />
+                    {(selectedResource?.employer_logo || selectedResource?.logoUrl) && (
+                      <Image src={selectedResource.employer_logo || selectedResource.logoUrl} alt={`${selectedResource.employer_name || selectedResource.companyName} logo`} className="mt-6 max-w-xs mx-auto" />
                     )}
                   </article>
                 )}
@@ -313,12 +343,12 @@ export default function ResourcesPage() {
                   onClick={() => {
                     onClose();
                     handleApply({
-                      company: selectedResource.employer_name,
-                      title: selectedResource.job_title,
-                      location: `${selectedResource.job_city}, ${selectedResource.job_country}`,
-                      description: selectedResource.job_description,
-                      url: selectedResource.job_apply_link,
-                      isLocal: false
+                      company: selectedResource.employer_name || selectedResource.companyName,
+                      title: selectedResource.job_title || selectedResource.title,
+                      location: selectedResource.job_city || selectedResource.location,
+                      description: selectedResource.job_description || selectedResource.description,
+                      url: selectedResource.job_apply_link || selectedResource._id,
+                      isLocal: !selectedResource.job_id
                     });
                   }}
                 >
