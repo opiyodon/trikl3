@@ -95,7 +95,7 @@ export default function CompanyAttachments() {
           transition={{ delay: 0.2 }}
           className="text-center text-xl text-gray-500 mt-12"
         >
-          You haven't posted any attachments yet.
+          You haven&apos;t posted any attachments yet.
         </motion.p>
       ) : (
         <motion.div

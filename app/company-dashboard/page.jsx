@@ -69,7 +69,7 @@ const Dashboard = () => {
         <ToastContainer position="top-right" autoClose={5000} />
         <h1 className="text-4xl font-bold mb-4">Welcome back, {company?.companyName || 'Company'}!</h1>
         <p className="mb-8">
-          Let's manage your internships and find great talent.
+          Let&apos;s manage your internships and find great talent.
         </p>
         <Card>
           <CardHeader>
