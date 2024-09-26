@@ -10,7 +10,6 @@ Website: [https://trikl3.vercel.app/](https://trikl3.vercel.app/)
 
 - Centralized database of tech companies and startups in Kenya
 - Personalized recommendations for internships and attachment opportunities
-- Networking events and mentorship programs facilitation
 - User-friendly interface for both students and employers
 
 ## Getting Started
@@ -87,10 +86,6 @@ trikl3/
 
 4. **Application Tracking**: Students can track the status of their internship applications through the platform.
 
-5. **Networking Events**: Information about upcoming networking events and the ability to RSVP.
-
-6. **Mentorship Program**: A feature to connect students with industry professionals for guidance and advice.
-
 ## Deployment
 
 The project is deployed on Vercel. To deploy your own instance:
@@ -118,7 +113,3 @@ This project is licensed under the MIT License - see the [LICENSE.md](LICENSE.md
 ## Support
 
 If you encounter any issues or have questions, please file an issue on the GitHub repository or contact our support team at support@trikl3.com.
-
----
-
-This README is a living document and will be updated as the project evolves. Last updated: [Current Date]
